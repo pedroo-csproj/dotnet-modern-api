@@ -5,4 +5,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\DotNETModernAPI.Infrastructure.CrossCutting.Core\DotNETModernAPI.Infrastructure.CrossCutting.Core.csproj" />
+	</ItemGroup>
+
 </Project>

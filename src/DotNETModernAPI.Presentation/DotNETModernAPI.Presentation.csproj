@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<TargetFramework>net7.0</TargetFramework>
@@ -8,6 +8,12 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.10" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\DotNETModernAPI.Application\DotNETModernAPI.Application.csproj" />
+		<ProjectReference Include="..\DotNETModernAPI.Infrastructure.CrossCutting.Core\DotNETModernAPI.Infrastructure.CrossCutting.Core.csproj" />
+		<ProjectReference Include="..\DotNETModernAPI.Infrastructure.CrossCutting\DotNETModernAPI.Infrastructure.CrossCutting.csproj" />
 	</ItemGroup>
 
 </Project>
