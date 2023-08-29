@@ -6,7 +6,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\DotNETModernAPI.Infrastructure.CrossCutting.Core\DotNETModernAPI.Infrastructure.CrossCutting.Core.csproj" />
+		<PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.10" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\DotNETModernAPI.Infrastructure.CrossCutting.Core\DotNETModernAPI.Infrastructure.CrossCutting.Core.csproj" />
 	</ItemGroup>
 
 </Project>
