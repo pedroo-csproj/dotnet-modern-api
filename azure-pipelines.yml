@@ -4,6 +4,9 @@ trigger:
 pool:
   vmImage: 'ubuntu-22.04'
 
+variables:
+  - group: 'production'
+
 stages:
   - stage: 'create_or_update_infrastructure'
     displayName: 'Create or Update Infrastructure'
