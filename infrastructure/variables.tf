@@ -26,11 +26,10 @@ variable "service_plan_sku_name" {
   type = string
 }
 
-
-variable "app_service_name" {
+variable "linux_web_app_name" {
   type = string
 }
 
-variable "app_service_https_only" {
+variable "linux_web_app_https_only" {
   type = bool
 }

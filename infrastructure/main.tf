@@ -26,10 +26,12 @@ resource "azurerm_service_plan" "sp-dnma" {
   sku_name            = var.service_plan_sku_name
 }
 
-resource "azurerm_app_service" "as-dnma" {
-  name                = var.app_service_name
+resource "azurerm_linux_web_app" "lwa" {
+  name                = var.linux_web_app_name
   resource_group_name = azurerm_resource_group.rg-dnma.name
   location            = azurerm_resource_group.rg-dnma.location
-  app_service_plan_id = azurerm_service_plan.sp-dnma.id
-  https_only          = var.app_service_https_only
+  service_plan_id     = azurerm_service_plan.sp-dnma.id
+  https_only          = var.linux_web_app_https_only
+
+  site_config {}
 }

@@ -8,5 +8,5 @@ service_plan_name     = "#{ServicePlanName}#"
 service_plan_os_type  = "#{ServicePlanOSType}#"
 service_plan_sku_name = "#{ServicePlanSKUName}#"
 
-app_service_name       = "#{AppServiceName}#"
-app_service_https_only = "#{AppServiceHTTPsOnly}#"
+linux_web_app_name       = "#{LinuxWebAppName}#"
+linux_web_app_https_only = "#{LinuxWebAppHTTPsOnly}#"
