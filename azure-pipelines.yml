@@ -34,3 +34,4 @@ stages:
           command: 'apply'
           workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
           environmentServiceNameAzureRM: 'Pay-As-You-Go(dc78a565-ae43-4a3f-ba70-2248f89c3674)'
+          varFile: '$(System.DefaultWorkingDirectory)/infrastructure/terraform.tfvars'
