@@ -38,6 +38,7 @@ resource "azurerm_linux_web_app" "lwa-dnma" {
     application_stack {
       docker_registry_url      = "https://${var.linux_web_app_name}.azurecr.io"
       docker_image_name        = "${var.linux_web_app_name}:${var.build_id}"
+      dotnet_version = "7.0"
       docker_registry_username = "crdnma"
       docker_registry_password = "f3sItPegRcapxnk/qxjJOAjULqIur1Jfob45/ZwNjE+ACRCJkqj7"
     }
