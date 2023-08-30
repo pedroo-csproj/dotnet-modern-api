@@ -1,2 +1,2 @@
-resource_group_name     = "resourceGroupName"
-resource_group_location = "resourceGroupLocation"
+resource_group_name     = "rg-dnma"
+resource_group_location = "eastus"
