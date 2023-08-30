@@ -18,10 +18,6 @@ variable "service_plan_name" {
   type = string
 }
 
-variable "service_plan_kind" {
-  type = string
-}
-
 variable "service_plan_os_type" {
   type = string
 }
