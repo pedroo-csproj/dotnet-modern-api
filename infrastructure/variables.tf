@@ -22,17 +22,14 @@ variable "service_plan_kind" {
   type = string
 }
 
-variable "service_plan_sku_tier" {
+variable "service_plan_os_type" {
   type = string
 }
 
-variable "service_plan_sku_size" {
+variable "service_plan_sku_name" {
   type = string
 }
 
-variable "service_plan_sku_capacity" {
-  type = string
-}
 
 variable "app_service_name" {
   type = string

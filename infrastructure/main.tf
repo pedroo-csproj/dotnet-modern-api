@@ -23,13 +23,9 @@ resource "azurerm_service_plan" "sp-dnma" {
   location            = azurerm_resource_group.rg-dnma.location
   resource_group_name = azurerm_resource_group.rg-dnma.name
   kind                = var.service_plan_kind
+  os_type             = var.service_plan_os_type
+  sku_name            = var.service_plan_sku_name
   reserved            = true
-
-  sku {
-    tier     = var.service_plan_sku_tier
-    size     = var.service_plan_sku_size
-    capacity = var.service_plan_sku_capacity
-  }
 }
 
 resource "azurerm_app_service" "as-dnma" {
