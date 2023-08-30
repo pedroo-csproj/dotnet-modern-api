@@ -1,0 +1,5 @@
+trigger:
+  - develop
+
+pool:
+  vmImage: 'ubuntu-22.04'
