@@ -42,4 +42,10 @@ resource "azurerm_linux_web_app" "lwa-dnma" {
       docker_registry_password = "3bwJePpyQXSV/BSiM794w2SR1/cCLUIObCebMqmOIj+ACRCwTewA"
     }
   }
+
+  app_settings = {
+    "DOCKER_REGISTRY_SERVER_PASSWORD" = "3bwJePpyQXSV/BSiM794w2SR1/cCLUIObCebMqmOIj+ACRCwTewA"
+    "DOCKER_REGISTRY_SERVER_URL"      = "https://${var.linux_web_app_name}.azurecr.io"
+    "DOCKER_REGISTRY_SERVER_USERNAME" = "crdnma"
+  }
 }
