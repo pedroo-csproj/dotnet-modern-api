@@ -3,3 +3,27 @@ trigger:
 
 pool:
   vmImage: 'ubuntu-22.04'
+
+stages:
+  - stage: 'create_or_update_infrastructure'
+    displayName: 'Create or Update Infrastructure'
+    jobs:
+    - job: 'run_terraform'
+      displayName: 'Run Terraform'
+      continueOnError: false
+      steps:
+      - task: TerraformTaskV4@4
+        displayName: 'Init Terraform'
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
+          backendServiceArm: 'Pay-As-You-Go(dc78a565-ae43-4a3f-ba70-2248f89c3674)'
+
+      - task: TerraformTaskV4@4
+        displayName: 'Apply Terraform'
+        inputs:
+          provider: 'azurerm'
+          command: 'apply'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
+          environmentServiceNameAzureRM: 'Pay-As-You-Go(dc78a565-ae43-4a3f-ba70-2248f89c3674)'
