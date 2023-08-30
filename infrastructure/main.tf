@@ -16,6 +16,7 @@ resource "azurerm_container_registry" "cr-dnma" {
   resource_group_name = azurerm_resource_group.rg-dnma.name
   location            = azurerm_resource_group.rg-dnma.location
   sku                 = var.container_registry_sku
+  admin_enabled       = true
 }
 
 resource "azurerm_service_plan" "sp-dnma" {
@@ -36,7 +37,7 @@ resource "azurerm_linux_web_app" "lwa-dnma" {
   site_config {
     application_stack {
       docker_registry_url      = "https://crdnma.azurecr.io"
-      docker_image_name        = "crdnma/dnma:499"
+      docker_image_name        = "dnma:${var.build_id}"
       docker_registry_username = "crdnma"
       docker_registry_password = "CkcNHViwALB0ikg+8UAeoaNwxqFvGOxepc24TQXWhF+ACRCzH4DV"
     }
