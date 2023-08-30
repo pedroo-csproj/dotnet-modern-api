@@ -5,7 +5,7 @@ variables:
   - group: 'production'
 
 pool:
-  vmImage: '$(PipelineVmImage)'
+  vmImage: 'ubuntu-22.04'
 
 stages:
   - stage: 'create_or_update_infrastructure'
@@ -38,10 +38,10 @@ stages:
           command: 'init'
           workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
           backendServiceArm: '$(Subscription)'
-          backendAzureRmResourceGroupName: 'rg-dnma-prod'
-          backendAzureRmStorageAccountName: 'sadnmaprod'
-          backendAzureRmContainerName: 'terraform'
-          backendAzureRmKey: 'fCdkNeZYxaeinXzUxxYY2ZaD/7lXSMIEW/WMFHdXPdv7rEbiTsCqQtS48bFTAiOM8RuBVMbUDdP7+ASttfn2hA=='
+          backendAzureRmResourceGroupName: '$(CoreResourceGroupName)'
+          backendAzureRmStorageAccountName: '$(CoreResourceGroupStorageAccountName)'
+          backendAzureRmContainerName: '$(CoreResourceGroupStorageAccountContainerName)'
+          backendAzureRmKey: '$(CoreResourceGroupStorageAccountKey)'
 
       - task: TerraformTaskV4@4
         displayName: 'Apply Terraform'
