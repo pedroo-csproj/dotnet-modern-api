@@ -15,6 +15,22 @@ stages:
       displayName: 'Run Terraform'
       continueOnError: false
       steps:
+      - task: replacetokens@5
+        displayName: 'Replace Variables'
+        inputs:
+          rootDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
+          targetFiles: 'terraform.tfvars'
+          encoding: 'auto'
+          tokenPattern: 'default'
+          writeBOM: true
+          actionOnMissing: 'fail'
+          keepToken: false
+          actionOnNoFiles: 'continue'
+          enableTransforms: false
+          enableRecursion: false
+          useLegacyPattern: false
+          enableTelemetry: true
+
       - task: TerraformTaskV4@4
         displayName: 'Init Terraform'
         inputs:
@@ -34,6 +50,3 @@ stages:
           command: 'apply'
           workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
           environmentServiceNameAzureRM: 'Pay-As-You-Go(dc78a565-ae43-4a3f-ba70-2248f89c3674)'
-          vars: |
-            resourceGroupName=$(ResourceGroupName)
-            resourceGroupLocation=$(ResourceGroupLocation)
