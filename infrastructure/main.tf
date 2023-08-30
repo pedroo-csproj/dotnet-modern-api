@@ -33,4 +33,13 @@ resource "azurerm_linux_web_app" "lwa-dnma" {
   location            = azurerm_resource_group.rg-dnma.location
   service_plan_id     = azurerm_service_plan.sp-dnma.id
   https_only          = var.linux_web_app_https_only
+
+  site_config {
+    application_stack {
+      docker_registry_url      = "https://${var.linux_web_app_name}.azurecr.io"
+      docker_image_name        = "${var.linux_web_app_name}:${var.build_id}"
+      docker_registry_username = "crdnma"
+      docker_registry_password = "f3sItPegRcapxnk/qxjJOAjULqIur1Jfob45/ZwNjE+ACRCJkqj7"
+    }
+  }
 }
