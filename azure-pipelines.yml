@@ -1,11 +1,11 @@
 trigger:
   - develop
 
-pool:
-  vmImage: 'ubuntu-22.04'
-
 variables:
   - group: 'production'
+
+pool:
+  vmImage: '$(PipelineVmImage)'
 
 stages:
   - stage: 'create_or_update_infrastructure'
@@ -37,7 +37,7 @@ stages:
           provider: 'azurerm'
           command: 'init'
           workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
-          backendServiceArm: 'Pay-As-You-Go(dc78a565-ae43-4a3f-ba70-2248f89c3674)'
+          backendServiceArm: '$(Subscription)'
           backendAzureRmResourceGroupName: 'rg-dnma-prod'
           backendAzureRmStorageAccountName: 'sadnmaprod'
           backendAzureRmContainerName: 'terraform'
@@ -49,7 +49,7 @@ stages:
           provider: 'azurerm'
           command: 'apply'
           workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
-          environmentServiceNameAzureRM: 'Pay-As-You-Go(dc78a565-ae43-4a3f-ba70-2248f89c3674)'
+          environmentServiceNameAzureRM: '$(Subscription)'
 
   - stage: 'build_services'
     displayName: 'Build Services'
@@ -59,8 +59,8 @@ stages:
         steps:
         - task: Docker@2
           inputs:
-            containerRegistry: 'crdnma'
-            repository: 'dnma'
+            containerRegistry: '$(ContainerRegistryName)'
+            repository: '$(ContainerRepositoryName)'
             command: 'buildAndPush'
             Dockerfile: '$(System.DefaultWorkingDirectory)/src/DotNETModernAPI.Presentation/Dockerfile'
             buildContext: '$(System.DefaultWorkingDirectory)/src'
@@ -69,9 +69,9 @@ stages:
         - task: AzureRmWebAppDeployment@4
           inputs:
             ConnectionType: 'AzureRM'
-            azureSubscription: 'Pay-As-You-Go(dc78a565-ae43-4a3f-ba70-2248f89c3674)'
+            azureSubscription: '$(Subscription)'
             appType: 'webAppContainer'
-            WebAppName: 'lwa-dnma'
-            DockerNamespace: 'crdnma.azurecr.io'
-            DockerRepository: 'dnma'
+            WebAppName: '$(LinuxWebAppName)'
+            DockerNamespace: '$(ContainerRegistryName).azurecr.io'
+            DockerRepository: '$(ContainerRepositoryName)'
             DockerImageTag: '$(Build.BuildId)'
