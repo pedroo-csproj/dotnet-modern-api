@@ -23,6 +23,7 @@ resource "azurerm_app_service_plan" "asp_dnma" {
   location            = azurerm_resource_group.rg-dnma.location
   resource_group_name = azurerm_resource_group.rg-dnma.name
   kind                = var.app_service_plan_kind
+  reserved            = true
 
   sku {
     tier     = var.app_service_plan_sku_tier
