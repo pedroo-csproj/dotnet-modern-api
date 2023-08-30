@@ -36,8 +36,8 @@ resource "azurerm_linux_web_app" "lwa-dnma" {
 
   site_config {
     application_stack {
-      docker_registry_url      = "https://${azurerm_linux_web_app.lwa-dnma.name}.azurecr.io"
-      docker_image_name        = "${azurerm_linux_web_app.lwa-dnma.name}:${var.build_id}"
+      docker_registry_url      = "https://${var.linux_web_app_name}.azurecr.io"
+      docker_image_name        = "${var.linux_web_app_name}:${var.build_id}"
       docker_registry_username = "crdnma"
       docker_registry_password = "f3sItPegRcapxnk/qxjJOAjULqIur1Jfob45/ZwNjE+ACRCJkqj7"
     }
