@@ -39,7 +39,7 @@ resource "azurerm_linux_web_app" "lwa-dnma" {
       docker_registry_url      = "https://crdnma.azurecr.io"
       docker_image_name        = "dnma:${var.build_id}"
       docker_registry_username = "crdnma"
-      docker_registry_password = "CkcNHViwALB0ikg+8UAeoaNwxqFvGOxepc24TQXWhF+ACRCzH4DV"
+      docker_registry_password = "f3sItPegRcapxnk/qxjJOAjULqIur1Jfob45/ZwNjE+ACRCJkqj7"
     }
   }
 }
