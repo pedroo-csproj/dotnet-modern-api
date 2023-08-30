@@ -20,7 +20,7 @@ resource "azurerm_container_registry" "cr-dnma" {
 
 resource "azurerm_app_service_plan" "asp_dnma" {
   name                = var.app_service_plan_name
-  local               = azurerm_resource_group.rg-dnma.location
+  location            = azurerm_resource_group.rg-dnma.location
   resource_group_name = azurerm_resource_group.rg-dnma.name
   kind                = var.app_service_plan_kind
 
