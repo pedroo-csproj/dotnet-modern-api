@@ -54,7 +54,7 @@ stages:
   - stage: 'build_services'
     displayName: 'Build Services'
     jobs:
-      - job: 'dotnet-modern-api'
+      - job: 'dotnet_modern_api'
         displayName: '.NET Modern API'
         steps:
         - task: Docker@2
