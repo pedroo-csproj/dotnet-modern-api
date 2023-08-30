@@ -26,12 +26,20 @@ resource "azurerm_service_plan" "sp-dnma" {
   sku_name            = var.service_plan_sku_name
 }
 
-resource "azurerm_linux_web_app" "lwa" {
+resource "azurerm_linux_web_app" "lwa-dnma" {
   name                = var.linux_web_app_name
   resource_group_name = azurerm_resource_group.rg-dnma.name
   location            = azurerm_resource_group.rg-dnma.location
   service_plan_id     = azurerm_service_plan.sp-dnma.id
   https_only          = var.linux_web_app_https_only
 
-  site_config {}
+  site_config {
+    application_stack {
+      docker_registry_url      = "crdnma.azurecr.io"
+      docker_image_name        = "crdnma/dnma:499"
+      dotnet_version           = "7.0"
+      docker_registry_username = "crdnma"
+      docker_registry_password = "CkcNHViwALB0ikg+8UAeoaNwxqFvGOxepc24TQXWhF+ACRCzH4DV"
+    }
+  }
 }
