@@ -17,8 +17,6 @@ resource "azurerm_container_registry" "cr-dnma" {
   location            = azurerm_resource_group.rg-dnma.location
   sku                 = var.container_registry_sku
   admin_enabled       = true
-  admin_username="admin"
-  admin_password="ituyq7&&**lllopAAAA--"
 }
 
 resource "azurerm_service_plan" "sp-dnma" {
@@ -40,14 +38,14 @@ resource "azurerm_linux_web_app" "lwa-dnma" {
     application_stack {
       docker_registry_url      = "https://${var.linux_web_app_name}.azurecr.io"
       docker_image_name        = "${var.linux_web_app_name}:${var.build_id}"
-      docker_registry_username = "admin"
-      docker_registry_password = "ituyq7&&**lllopAAAA--"
+      docker_registry_username = azurerm_container_registry.cr-dnma.admin_username
+      docker_registry_password = azurerm_container_registry.cr-dnma.admin_password
     }
   }
 
   app_settings = {
-    "DOCKER_REGISTRY_SERVER_PASSWORD" = "ituyq7&&**lllopAAAA--"
+    "DOCKER_REGISTRY_SERVER_PASSWORD" = azurerm_container_registry.cr-dnma.admin_password
     "DOCKER_REGISTRY_SERVER_URL"      = "https://${var.linux_web_app_name}.azurecr.io"
-    "DOCKER_REGISTRY_SERVER_USERNAME" = "admin"
+    "DOCKER_REGISTRY_SERVER_USERNAME" = azurerm_container_registry.cr-dnma.admin_username
   }
 }
