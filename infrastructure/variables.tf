@@ -14,23 +14,23 @@ variable "container_registry_sku" {
   type = string
 }
 
-variable "app_service_plan_name" {
+variable "service_plan_name" {
   type = string
 }
 
-variable "app_service_plan_kind" {
+variable "service_plan_kind" {
   type = string
 }
 
-variable "app_service_plan_sku_tier" {
+variable "service_plan_sku_tier" {
   type = string
 }
 
-variable "app_service_plan_sku_size" {
+variable "service_plan_sku_size" {
   type = string
 }
 
-variable "app_service_plan_sku_capacity" {
+variable "service_plan_sku_capacity" {
   type = string
 }
 

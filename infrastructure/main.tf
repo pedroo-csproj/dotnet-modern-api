@@ -18,17 +18,17 @@ resource "azurerm_container_registry" "cr-dnma" {
   sku                 = var.container_registry_sku
 }
 
-resource "azurerm_app_service_plan" "asp_dnma" {
-  name                = var.app_service_plan_name
+resource "azurerm_service_plan" "sp-dnma" {
+  name                = var.service_plan_name
   location            = azurerm_resource_group.rg-dnma.location
   resource_group_name = azurerm_resource_group.rg-dnma.name
-  kind                = var.app_service_plan_kind
+  kind                = var.service_plan_kind
   reserved            = true
 
   sku {
-    tier     = var.app_service_plan_sku_tier
-    size     = var.app_service_plan_sku_size
-    capacity = var.app_service_plan_sku_capacity
+    tier     = var.service_plan_sku_tier
+    size     = var.service_plan_sku_size
+    capacity = var.service_plan_sku_capacity
   }
 }
 
@@ -36,6 +36,6 @@ resource "azurerm_app_service" "as-dnma" {
   name                = var.app_service_name
   resource_group_name = azurerm_resource_group.rg-dnma.name
   location            = azurerm_resource_group.rg-dnma.location
-  app_service_plan_id = azurerm_app_service_plan.asp_dnma.name
+  app_service_plan_id = azurerm_service_plan.sp-dnma.id
   https_only          = var.app_service_https_only
 }
