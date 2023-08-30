@@ -19,6 +19,10 @@ stages:
           command: 'init'
           workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
           backendServiceArm: 'Pay-As-You-Go(dc78a565-ae43-4a3f-ba70-2248f89c3674)'
+          backendAzureRmResourceGroupName: 'rg-dnma-prod'
+          backendAzureRmStorageAccountName: 'sadnmaprod'
+          backendAzureRmContainerName: 'terraform'
+          backendAzureRmKey: 'fCdkNeZYxaeinXzUxxYY2ZaD/7lXSMIEW/WMFHdXPdv7rEbiTsCqQtS48bFTAiOM8RuBVMbUDdP7+ASttfn2hA=='
 
       - task: TerraformTaskV4@4
         displayName: 'Apply Terraform'
