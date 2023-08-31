@@ -8,8 +8,23 @@ pool:
   vmImage: 'ubuntu-22.04'
 
 stages:
-  - stage: 'create_or_update_infrastructure'
-    displayName: 'Create or Update Infrastructure'
+  - stage: 'test_services'
+    displayName: 'Test Services'
+    jobs:
+    - job: 'dotnet_modern_api'
+      displayName: '.NET Modern API'
+      continueOnError: false
+      steps:
+        - task: DotNetCoreCLI@2
+          displayName: 'Test'
+          inputs:
+            command: 'test'
+            projects: '**/*.csproj'
+            arguments: '-c Test'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/src/tests'
+
+  - stage: 'update_infrastructure'
+    displayName: 'Update Infrastructure'
     jobs:
     - job: 'run_terraform'
       displayName: 'Run Terraform'
