@@ -11,6 +11,7 @@ COPY ["DotNETModernAPI.Domain/DotNETModernAPI.Domain.csproj", "DotNETModernAPI.D
 COPY ["DotNETModernAPI.Infrastructure.CrossCutting.Core/DotNETModernAPI.Infrastructure.CrossCutting.Core.csproj", "DotNETModernAPI.Infrastructure.CrossCutting.Core/"]
 COPY ["DotNETModernAPI.Infrastructure.CrossCutting/DotNETModernAPI.Infrastructure.CrossCutting.csproj", "DotNETModernAPI.Infrastructure.CrossCutting/"]
 COPY ["DotNETModernAPI.Infrastructure.Data/DotNETModernAPI.Infrastructure.Data.csproj", "DotNETModernAPI.Infrastructure.Data/"]
+COPY ["DotNETModernAPI.Infrastructure.Data.Migrations/DotNETModernAPI.Infrastructure.Data.Migrations.csproj", "DotNETModernAPI.Infrastructure.Data.Migrations/"]
 RUN dotnet restore "DotNETModernAPI.Presentation/DotNETModernAPI.Presentation.csproj"
 COPY . .
 WORKDIR "/src/DotNETModernAPI.Presentation"
