@@ -15,23 +15,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.0 - Data", "3.0 - Data", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.1 - Cross Cutting", "3.1 - Cross Cutting", "{EFB592B5-EC53-4FC4-9336-ED20114BE179}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNETModernAPI.Presentation", "DotNETModernAPI.Presentation\DotNETModernAPI.Presentation.csproj", "{48E4C2F1-9825-4FE4-B0DC-288849D612F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNETModernAPI.Presentation", "DotNETModernAPI.Presentation\DotNETModernAPI.Presentation.csproj", "{48E4C2F1-9825-4FE4-B0DC-288849D612F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNETModernAPI.Application", "DotNETModernAPI.Application\DotNETModernAPI.Application.csproj", "{F73995B1-699B-4E98-BD6B-80099D7466A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNETModernAPI.Application", "DotNETModernAPI.Application\DotNETModernAPI.Application.csproj", "{F73995B1-699B-4E98-BD6B-80099D7466A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNETModernAPI.Domain", "DotNETModernAPI.Domain\DotNETModernAPI.Domain.csproj", "{EFAD452E-E616-4051-A094-92CB44FAA4C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNETModernAPI.Domain", "DotNETModernAPI.Domain\DotNETModernAPI.Domain.csproj", "{EFAD452E-E616-4051-A094-92CB44FAA4C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNETModernAPI.Infrastructure.Data", "DotNETModernAPI.Infrastructure.Data\DotNETModernAPI.Infrastructure.Data.csproj", "{B8AD3557-FA75-412B-B4DC-2AA1D7CB9D98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNETModernAPI.Infrastructure.Data", "DotNETModernAPI.Infrastructure.Data\DotNETModernAPI.Infrastructure.Data.csproj", "{B8AD3557-FA75-412B-B4DC-2AA1D7CB9D98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNETModernAPI.Infrastructure.CrossCutting", "DotNETModernAPI.Infrastructure.CrossCutting\DotNETModernAPI.Infrastructure.CrossCutting.csproj", "{F505F5D4-8BCC-46FA-A2E7-40E88CF2B5A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNETModernAPI.Infrastructure.CrossCutting", "DotNETModernAPI.Infrastructure.CrossCutting\DotNETModernAPI.Infrastructure.CrossCutting.csproj", "{F505F5D4-8BCC-46FA-A2E7-40E88CF2B5A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNETModernAPI.Infrastructure.CrossCutting.Core", "DotNETModernAPI.Infrastructure.CrossCutting.Core\DotNETModernAPI.Infrastructure.CrossCutting.Core.csproj", "{C263EFFA-9D3B-4A7E-B9BD-1AC2D9C18EDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNETModernAPI.Infrastructure.CrossCutting.Core", "DotNETModernAPI.Infrastructure.CrossCutting.Core\DotNETModernAPI.Infrastructure.CrossCutting.Core.csproj", "{C263EFFA-9D3B-4A7E-B9BD-1AC2D9C18EDB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F0F8ABD0-BF3C-47B7-A055-4BB974761C91}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 - Domain", "2 - Domain", "{49147F11-F517-423A-81B9-F96A70C276DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNETModernAPI.Domain.Tests", "tests\DotNETModernAPI.Domain.Tests\DotNETModernAPI.Domain.Tests.csproj", "{A800718A-5AC7-449A-89A7-B0AD4E64414F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNETModernAPI.Domain.Tests", "tests\DotNETModernAPI.Domain.Tests\DotNETModernAPI.Domain.Tests.csproj", "{A800718A-5AC7-449A-89A7-B0AD4E64414F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNETModernAPI.Infrastructure.Data.Migrations", "DotNETModernAPI.Infrastructure.Data.Migrations\DotNETModernAPI.Infrastructure.Data.Migrations.csproj", "{8466347B-D1E7-406F-9064-632357D772B7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 - Application", "1 - Application", "{DCF069D7-B06B-4AFC-BC5D-70C5856F8881}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNETModernAPI.Application.Tests", "tests\DotNETModernAPI.Application.Tests\DotNETModernAPI.Application.Tests.csproj", "{A01A1E2A-624A-439E-978C-256888FD1036}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +73,14 @@ Global
 		{A800718A-5AC7-449A-89A7-B0AD4E64414F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A800718A-5AC7-449A-89A7-B0AD4E64414F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A800718A-5AC7-449A-89A7-B0AD4E64414F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8466347B-D1E7-406F-9064-632357D772B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8466347B-D1E7-406F-9064-632357D772B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8466347B-D1E7-406F-9064-632357D772B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8466347B-D1E7-406F-9064-632357D772B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A01A1E2A-624A-439E-978C-256888FD1036}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A01A1E2A-624A-439E-978C-256888FD1036}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A01A1E2A-624A-439E-978C-256888FD1036}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A01A1E2A-624A-439E-978C-256888FD1036}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,6 +96,9 @@ Global
 		{C263EFFA-9D3B-4A7E-B9BD-1AC2D9C18EDB} = {EFB592B5-EC53-4FC4-9336-ED20114BE179}
 		{49147F11-F517-423A-81B9-F96A70C276DA} = {F0F8ABD0-BF3C-47B7-A055-4BB974761C91}
 		{A800718A-5AC7-449A-89A7-B0AD4E64414F} = {49147F11-F517-423A-81B9-F96A70C276DA}
+		{8466347B-D1E7-406F-9064-632357D772B7} = {7A304A06-1C81-4584-94BC-384FC543E1DB}
+		{DCF069D7-B06B-4AFC-BC5D-70C5856F8881} = {F0F8ABD0-BF3C-47B7-A055-4BB974761C91}
+		{A01A1E2A-624A-439E-978C-256888FD1036} = {DCF069D7-B06B-4AFC-BC5D-70C5856F8881}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {10C69A70-37C5-448A-94BD-22B55D059253}

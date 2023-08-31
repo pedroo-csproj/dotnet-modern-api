@@ -12,7 +12,7 @@ public class User : IdentityUser<Guid>
         NormalizedUserName = userName.ToUpper();
         Email = email;
         NormalizedEmail = email.ToUpper();
-        EmailConfirmed = false;
+        EmailConfirmed = true;
     }
 
     public override Guid Id { get; set; }

@@ -6,6 +6,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.10" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\DotNETModernAPI.Domain\DotNETModernAPI.Domain.csproj" />
 		<ProjectReference Include="..\DotNETModernAPI.Infrastructure.CrossCutting.Core\DotNETModernAPI.Infrastructure.CrossCutting.Core.csproj" />
 	</ItemGroup>

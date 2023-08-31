@@ -7,12 +7,17 @@ namespace DotNETModernAPI.Domain.Tests.Entities;
 
 public class UserTests
 {
+    public UserTests() =>
+        _faker = new Faker();
+
+    private readonly Faker _faker;
+
     [Fact(DisplayName = "Instance New - ValidData")]
     public void InstanceNew_ValidData_MustReturnANewUserWithTheProvidedData()
     {
         // Arrange
-        var userName = new Faker().Internet.UserName();
-        var email = new Faker().Internet.Email();
+        var userName = _faker.Internet.UserName();
+        var email = _faker.Internet.Email();
 
         // Act
         var user = new User(userName, email);
@@ -23,7 +28,7 @@ public class UserTests
         Assert.Equal(userName.ToUpper(), user.NormalizedUserName);
         Assert.Equal(email, user.Email);
         Assert.Equal(email.ToUpper(), user.NormalizedEmail);
-        Assert.False(user.EmailConfirmed);
+        Assert.True(user.EmailConfirmed);
         Assert.Null(user.PasswordHash);
         Assert.Null(user.SecurityStamp);
         Assert.NotEqual(Guid.Empty.ToString(), user.ConcurrencyStamp);
@@ -42,7 +47,7 @@ public class UserTests
     {
         // Arrange
         var user = GenerateUser();
-        var userName = new Faker().Internet.UserName();
+        var userName = _faker.Internet.UserName();
 
         // Act
         user.UpdateUserName(userName);
@@ -57,7 +62,7 @@ public class UserTests
     {
         // Arrange
         var user = GenerateUser();
-        var email = new Faker().Internet.Email();
+        var email = _faker.Internet.Email();
 
         // Act
         user.UpdateEmail(email);
@@ -74,7 +79,7 @@ public class UserTests
         var user = GenerateUser();
 
         // Act
-        var exception = Assert.Throws<UnusedIdentityFieldException>(() => user.PhoneNumber = new Faker().Phone.PhoneNumber());
+        var exception = Assert.Throws<UnusedIdentityFieldException>(() => user.PhoneNumber = _faker.Phone.PhoneNumber());
 
         // Assert
         Assert.Equal($"Field \"{nameof(user.PhoneNumber)}\" aren't supose to be used", exception.Message);

@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  api:
+    container_name: api
+    build:
+      context: ./src
+      dockerfile: ./DotNETModernAPI.Presentation/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "5001:80"
+      - "44389:443"
+    depends_on:
+        - db
+  db:
+    image: postgres:15-alpine
+    container_name: db
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=c86d88854a0a0d8ddf2f73d3f1f70043
+      - POSTGRES_DB=DotNETModernAPI
+    ports:
+      - 5432:5432
