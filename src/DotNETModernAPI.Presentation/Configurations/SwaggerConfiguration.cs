@@ -5,12 +5,17 @@ namespace DotNETModernAPI.Presentation.Configurations;
 internal static class SwaggerConfiguration
 {
     public static void AddSwagger(this IServiceCollection services, IConfiguration configuration) =>
-        services.AddSwaggerGen(c => c.SwaggerDoc("v1", BuildOpenApiInfo(configuration)));
+        services.AddSwaggerGen(sgo =>
+        {
+            sgo.SwaggerDoc("v1", BuildOpenApiInfo(configuration));
+            sgo.AddSecurityDefinition("Bearer", BuildOpenApiSecurityScheme());
+            sgo.AddSecurityRequirement(BuildOpenApiSecurityRequirement());
+        });
 
     public static void UseSwagger(this IApplicationBuilder app, IConfiguration configuration)
     {
         app.UseSwagger();
-        app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", $".NET Modern API - {configuration["Environment"]}"));
+        app.UseSwaggerUI(a => a.SwaggerEndpoint("/swagger/v1/swagger.json", $".NET Modern API - {configuration["Environment"]}"));
     }
 
     private static OpenApiInfo BuildOpenApiInfo(IConfiguration configuration) =>
@@ -30,5 +35,32 @@ internal static class SwaggerConfiguration
                 Name = "MIT",
                 Url = new Uri("https://github.com/pedroo-csproj/dotnet-modern-api/blob/main/LICENSE")
             }
+        };
+
+    private static OpenApiSecurityScheme BuildOpenApiSecurityScheme() =>
+        new()
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = "Bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Authorization header using the Bearer scheme."
+        };
+
+    private static OpenApiSecurityRequirement BuildOpenApiSecurityRequirement() =>
+        new()
+        {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
         };
 }

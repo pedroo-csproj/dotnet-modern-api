@@ -4,6 +4,23 @@ using Microsoft.AspNetCore.Identity;
 
 namespace DotNETModernAPI.Infrastructure.CrossCutting.Core.Models;
 
+public class ResultWrapper<TEntity>
+{
+    public ResultWrapper(EErrorCode errorCode) =>
+        ErrorCode = errorCode;
+
+    public ResultWrapper(TEntity data)
+    {
+        ErrorCode = EErrorCode.NoError;
+        Data = data;
+    }
+
+    public bool Success { get => ErrorCode == EErrorCode.NoError; }
+    public EErrorCode ErrorCode { get; private set; }
+    public IList<string> Errors { get; private set; } = new List<string>();
+    public TEntity Data { get; set; }
+}
+
 public class ResultWrapper
 {
     public ResultWrapper() =>

@@ -6,5 +6,6 @@ public enum EErrorCode
     UserNameAlreadyTaken = 1,
     EmailAlreadyTaken = 2,
     InvalidEntity = 3,
-    IdentityError = 4
+    IdentityError = 4,
+    EmailOrPasswordIncorrect = 5
 }
