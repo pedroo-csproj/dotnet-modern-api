@@ -2,7 +2,9 @@
 using DotNETModernAPI.Domain.Entities;
 using DotNETModernAPI.Domain.Models;
 using DotNETModernAPI.Domain.Providers;
+using DotNETModernAPI.Domain.Repositories;
 using DotNETModernAPI.Domain.Services;
+using DotNETModernAPI.Domain.Views;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.Enums;
 using FluentValidation;
 using FluentValidation.Results;
@@ -20,18 +22,47 @@ public class UserServicesTests
         var roleStore = new Mock<IRoleStore<Role>>();
         _userManager = new Mock<UserManager<User>>(userStore.Object, null, null, null, null, null, null, null, null);
         _roleManager = new Mock<RoleManager<Role>>(roleStore.Object, null, null, null, null);
+        _userRepository = new Mock<IUserRepository>();
         _emailProvider = new Mock<IEmailProvider>();
         _userValidator = new Mock<IValidator<User>>();
-        _userServices = new UserServices(_userManager.Object, _roleManager.Object, _emailProvider.Object, _userValidator.Object);
+        _userServices = new UserServices(_userManager.Object, _roleManager.Object, _userRepository.Object, _emailProvider.Object, _userValidator.Object);
         _faker = new Faker();
     }
 
     private readonly Mock<UserManager<User>> _userManager;
     private readonly Mock<RoleManager<Role>> _roleManager;
+    private readonly Mock<IUserRepository> _userRepository;
     private readonly Mock<IEmailProvider> _emailProvider;
     private readonly Mock<IValidator<User>> _userValidator;
     private readonly UserServices _userServices;
     private readonly Faker _faker;
+
+    #region List
+
+    [Fact(DisplayName = "List - Valid Data")]
+    public async void List_ValidData_MustReturnNoError()
+    {
+        // Arrange
+        var role = new List<RoleVO>() { new RoleVO(Guid.NewGuid(), "Admin") };
+        var userRoles = new List<UserRolesView>() { new UserRolesView(Guid.NewGuid(), _faker.Internet.UserName(), _faker.Internet.Email(), true, role) };
+
+        _userRepository.Setup(ur => ur.List()).Returns(Task.FromResult((IList<UserRolesView>)userRoles));
+
+        // Act
+        var result = await _userServices.List();
+
+        // Assert
+        Assert.True(result.Success);
+        Assert.Equal(EErrorCode.NoError, result.ErrorCode);
+        Assert.Empty(result.Errors);
+        Assert.Equal(userRoles, result.Data);
+
+        _userRepository.Verify(ur => ur.List(), Times.Once);
+    }
+
+    #endregion
+
+    #region Register
 
     [Fact(DisplayName = "Register - UserName already taken")]
     public async void Register_UserNameAlreadyTaken_MustReturnUserNameAlreadyTaken()
@@ -274,6 +305,8 @@ public class UserServicesTests
         _userManager.Verify(um => um.GenerateEmailConfirmationTokenAsync(It.IsAny<User>()), Times.Once);
         _emailProvider.Verify(ep => ep.SendAsync(It.IsAny<EmailRequestModel>()), Times.Once);
     }
+
+    #endregion
 
     private static User GenerateUser() =>
         new Faker<User>().CustomInstantiator(f => new User(f.Internet.UserName(), f.Internet.Email()));
