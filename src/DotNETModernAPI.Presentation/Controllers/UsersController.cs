@@ -45,6 +45,17 @@ public class UsersController : ControllerBase
         return Ok(handleResult);
     }
 
+    [HttpPost("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailCommandRequest commandRequest)
+    {
+        var handleResult = await _mediator.Send(commandRequest);
+
+        if (!handleResult.Success)
+            return BadRequest(handleResult);
+
+        return Ok(handleResult);
+    }
+
     [HttpPost("request-password-reset")]
     public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordResetCommandRequest commandRequest)
     {

@@ -137,4 +137,26 @@ public class UserServices
 
         return new ResultWrapper();
     }
+
+    public virtual async Task<ResultWrapper> ConfirmEmail(string email, string emailConfirmationToken)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        if (user == null)
+            return new ResultWrapper(EErrorCode.EmailNotFound);
+
+        if (user.EmailConfirmed)
+            return new ResultWrapper(EErrorCode.EmailAlreadyConfirmed);
+
+        var emailConfirmationResult = await _userManager.ConfirmEmailAsync(user, emailConfirmationToken);
+
+        if (!emailConfirmationResult.Succeeded)
+            return new ResultWrapper(emailConfirmationResult.Errors);
+
+        var emailRequest = new EmailRequestModel(user.Email, "Email Confirmed", $"Email confirmed.");
+
+        await _emailProvider.SendAsync(emailRequest);
+
+        return new ResultWrapper();
+    }
 }
