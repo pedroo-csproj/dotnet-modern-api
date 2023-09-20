@@ -8,6 +8,7 @@ public static class Bootsrapper
 {
     public static void AddDependencies(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddAutoMapper();
         services.AddDataContext(configuration);
         services.AddDomainServices();
         services.AddEmail(configuration);

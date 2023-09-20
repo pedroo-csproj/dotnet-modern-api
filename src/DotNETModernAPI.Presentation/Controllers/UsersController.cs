@@ -1,4 +1,5 @@
 ﻿using DotNETModernAPI.Application.UserContext.Commands.Requests;
+using DotNETModernAPI.Application.UserContext.Queries.Requests;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.Models;
 using DotNETModernAPI.Presentation.Services;
 using MediatR;
@@ -19,6 +20,17 @@ public class UsersController : ControllerBase
 
     private readonly IMediator _mediator;
     private readonly JwtServices _jwtServices;
+
+    [HttpGet]
+    public async Task<IActionResult> Register([FromQuery] ListUsersQueryRequest queryRequest)
+    {
+        var handleResult = await _mediator.Send(queryRequest);
+
+        if (!handleResult.Success)
+            return BadRequest(handleResult);
+
+        return Ok(handleResult);
+    }
 
     [HttpPost("authenticate")]
     public async Task<IActionResult> Authenticate([FromBody] AuthenticateUserCommandRequest commandRequest)

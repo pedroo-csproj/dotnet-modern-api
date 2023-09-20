@@ -1,6 +1,8 @@
 ﻿using DotNETModernAPI.Domain.Entities;
 using DotNETModernAPI.Domain.Models;
 using DotNETModernAPI.Domain.Providers;
+using DotNETModernAPI.Domain.Repositories;
+using DotNETModernAPI.Domain.Views;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.Enums;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.Models;
 using FluentValidation;
@@ -11,18 +13,23 @@ namespace DotNETModernAPI.Domain.Services;
 
 public class UserServices
 {
-    public UserServices(UserManager<User> userManager, RoleManager<Role> roleManager, IEmailProvider emailProvider, IValidator<User> userValidator)
+    public UserServices(UserManager<User> userManager, RoleManager<Role> roleManager, IUserRepository userRepository, IEmailProvider emailProvider, IValidator<User> userValidator)
     {
         _userManager = userManager;
         _roleManager = roleManager;
+        _userRepository = userRepository;
         _emailProvider = emailProvider;
         _userValidator = userValidator;
     }
 
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
+    private readonly IUserRepository _userRepository;
     private readonly IEmailProvider _emailProvider;
     private readonly IValidator<User> _userValidator;
+
+    public virtual async Task<ResultWrapper<IList<UserRolesView>>> List() =>
+        new ResultWrapper<IList<UserRolesView>>(await _userRepository.List());
 
     //TODO: apply the single responsability principle
     public virtual async Task<ResultWrapper<IList<Claim>>> Authenticate(string email, string password)
