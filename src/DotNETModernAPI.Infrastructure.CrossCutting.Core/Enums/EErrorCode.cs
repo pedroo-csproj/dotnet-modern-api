@@ -10,5 +10,6 @@ public enum EErrorCode
     EmailOrPasswordIncorrect = 5,
     EmailNotFound = 6,
     EmailNotConfirmed = 7,
-    RoleNotFound = 8
+    RoleNotFound = 8,
+    EmailAlreadyConfirmed = 9
 }

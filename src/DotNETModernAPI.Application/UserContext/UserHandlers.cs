@@ -9,7 +9,8 @@ namespace DotNETModernAPI.Application.UserContext;
 public class UserHandlers :
     IRequestHandler<AuthenticateUserCommandRequest, ResultWrapper<IList<Claim>>>,
     IRequestHandler<RegisterUserCommandRequest, ResultWrapper>,
-    IRequestHandler<RequestPasswordResetCommandRequest, ResultWrapper>
+    IRequestHandler<RequestPasswordResetCommandRequest, ResultWrapper>,
+    IRequestHandler<ResetPasswordCommandRequest, ResultWrapper>
 {
     public UserHandlers(UserServices userServices) =>
         _userServices = userServices;
@@ -24,4 +25,7 @@ public class UserHandlers :
 
     public async Task<ResultWrapper> Handle(RequestPasswordResetCommandRequest commandRequest, CancellationToken cancellationToken) =>
         await _userServices.RequestPasswordReset(commandRequest.Email);
+
+    public async Task<ResultWrapper> Handle(ResetPasswordCommandRequest commandRequest, CancellationToken cancellationToken) =>
+        await _userServices.ResetPassword(commandRequest.Email, commandRequest.NewPassword, commandRequest.PasswordResetToken);
 }

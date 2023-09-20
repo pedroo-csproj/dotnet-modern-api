@@ -29,7 +29,7 @@ public class UserServices
     {
         var user = await _userManager.FindByEmailAsync(email);
 
-        if (user != null)
+        if (user == null)
             return new ResultWrapper<IList<Claim>>(EErrorCode.EmailOrPasswordIncorrect);
 
         if (!user.EmailConfirmed)
@@ -70,6 +70,28 @@ public class UserServices
         var passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
 
         var emailRequest = new EmailRequestModel(email, "Reset your Password", $"<h1>{passwordResetToken}</h1>");
+
+        await _emailProvider.SendAsync(emailRequest);
+
+        return new ResultWrapper();
+    }
+
+    public virtual async Task<ResultWrapper> ResetPassword(string email, string newPassword, string passwordResetToken)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        if (user == null)
+            return new ResultWrapper(EErrorCode.EmailNotFound);
+
+        if (!user.EmailConfirmed)
+            return new ResultWrapper(EErrorCode.EmailNotConfirmed);
+
+        var resetPasswordResult = await _userManager.ResetPasswordAsync(user, passwordResetToken, newPassword);
+
+        if (!resetPasswordResult.Succeeded)
+            return new ResultWrapper(resetPasswordResult.Errors);
+
+        var emailRequest = new EmailRequestModel(user.Email, "Password Changed", $"Hello {user.UserName}, your password was changed successfully");
 
         await _emailProvider.SendAsync(emailRequest);
 

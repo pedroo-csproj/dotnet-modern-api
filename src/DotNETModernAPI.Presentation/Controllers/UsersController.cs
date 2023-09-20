@@ -55,4 +55,15 @@ public class UsersController : ControllerBase
 
         return Ok(handleResult);
     }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommandRequest commandRequest)
+    {
+        var handleResult = await _mediator.Send(commandRequest);
+
+        if (!handleResult.Success)
+            return BadRequest(handleResult);
+
+        return Ok(handleResult);
+    }
 }
