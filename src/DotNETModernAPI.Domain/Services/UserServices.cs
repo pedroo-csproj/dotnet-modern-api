@@ -64,47 +64,6 @@ public class UserServices
         return new ResultWrapper<IList<Claim>>(claims);
     }
 
-    public virtual async Task<ResultWrapper> RequestPasswordReset(string email)
-    {
-        var user = await _userManager.FindByEmailAsync(email);
-
-        if (user == null)
-            return new ResultWrapper(EErrorCode.EmailNotFound);
-
-        if (!user.EmailConfirmed)
-            return new ResultWrapper(EErrorCode.EmailNotConfirmed);
-
-        var passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-        var emailRequest = new EmailRequestModel(email, "Reset your Password", $"<h1>{passwordResetToken}</h1>");
-
-        await _emailProvider.SendAsync(emailRequest);
-
-        return new ResultWrapper();
-    }
-
-    public virtual async Task<ResultWrapper> ResetPassword(string email, string newPassword, string passwordResetToken)
-    {
-        var user = await _userManager.FindByEmailAsync(email);
-
-        if (user == null)
-            return new ResultWrapper(EErrorCode.EmailNotFound);
-
-        if (!user.EmailConfirmed)
-            return new ResultWrapper(EErrorCode.EmailNotConfirmed);
-
-        var resetPasswordResult = await _userManager.ResetPasswordAsync(user, passwordResetToken, newPassword);
-
-        if (!resetPasswordResult.Succeeded)
-            return new ResultWrapper(resetPasswordResult.Errors);
-
-        var emailRequest = new EmailRequestModel(user.Email, "Password Changed", $"Hello {user.UserName}, your password was changed successfully");
-
-        await _emailProvider.SendAsync(emailRequest);
-
-        return new ResultWrapper();
-    }
-
     //TODO: apply the single responsability principle
     public virtual async Task<ResultWrapper> Register(string userName, string email, string password, string roleId)
     {
@@ -161,6 +120,47 @@ public class UserServices
             return new ResultWrapper(emailConfirmationResult.Errors);
 
         var emailRequest = new EmailRequestModel(user.Email, "Email Confirmed", $"Email confirmed.");
+
+        await _emailProvider.SendAsync(emailRequest);
+
+        return new ResultWrapper();
+    }
+
+    public virtual async Task<ResultWrapper> RequestPasswordReset(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        if (user == null)
+            return new ResultWrapper(EErrorCode.EmailNotFound);
+
+        if (!user.EmailConfirmed)
+            return new ResultWrapper(EErrorCode.EmailNotConfirmed);
+
+        var passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        var emailRequest = new EmailRequestModel(email, "Reset your Password", $"<h1>{passwordResetToken}</h1>");
+
+        await _emailProvider.SendAsync(emailRequest);
+
+        return new ResultWrapper();
+    }
+
+    public virtual async Task<ResultWrapper> ResetPassword(string email, string newPassword, string passwordResetToken)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        if (user == null)
+            return new ResultWrapper(EErrorCode.EmailNotFound);
+
+        if (!user.EmailConfirmed)
+            return new ResultWrapper(EErrorCode.EmailNotConfirmed);
+
+        var resetPasswordResult = await _userManager.ResetPasswordAsync(user, passwordResetToken, newPassword);
+
+        if (!resetPasswordResult.Succeeded)
+            return new ResultWrapper(resetPasswordResult.Errors);
+
+        var emailRequest = new EmailRequestModel(user.Email, "Password Changed", $"Hello {user.UserName}, your password was changed successfully");
 
         await _emailProvider.SendAsync(emailRequest);
 

@@ -41,12 +41,12 @@ public class UserHandlers :
     public async Task<ResultWrapper> Handle(RegisterUserCommandRequest commandRequest, CancellationToken cancellationToken) =>
         await _userServices.Register(commandRequest.UserName, commandRequest.Email, commandRequest.Password, commandRequest.RoleId.ToString());
 
+    public async Task<ResultWrapper> Handle(ConfirmEmailCommandRequest commandRequest, CancellationToken cancellationToken) =>
+        await _userServices.ConfirmEmail(commandRequest.Email, commandRequest.EmailConfirmationToken);
+
     public async Task<ResultWrapper> Handle(RequestPasswordResetCommandRequest commandRequest, CancellationToken cancellationToken) =>
         await _userServices.RequestPasswordReset(commandRequest.Email);
 
     public async Task<ResultWrapper> Handle(ResetPasswordCommandRequest commandRequest, CancellationToken cancellationToken) =>
         await _userServices.ResetPassword(commandRequest.Email, commandRequest.NewPassword, commandRequest.PasswordResetToken);
-
-    public async Task<ResultWrapper> Handle(ConfirmEmailCommandRequest commandRequest, CancellationToken cancellationToken) =>
-        await _userServices.ConfirmEmail(commandRequest.Email, commandRequest.EmailConfirmationToken);
 }

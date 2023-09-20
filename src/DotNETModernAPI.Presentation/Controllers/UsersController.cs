@@ -22,7 +22,8 @@ public class UsersController : ControllerBase
     private readonly JwtServices _jwtServices;
 
     [HttpGet]
-    public async Task<IActionResult> Register([FromQuery] ListUsersQueryRequest queryRequest)
+    [Authorize(Policy = "UsersList")]
+    public async Task<IActionResult> List([FromQuery] ListUsersQueryRequest queryRequest)
     {
         var handleResult = await _mediator.Send(queryRequest);
 
