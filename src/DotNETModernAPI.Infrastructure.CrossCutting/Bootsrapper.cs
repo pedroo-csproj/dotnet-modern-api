@@ -10,8 +10,10 @@ public static class Bootsrapper
     {
         services.AddDataContext(configuration);
         services.AddDomainServices();
+        services.AddEmail(configuration);
         services.AddFluentValidation();
         services.AddIdentity();
         services.AddMediator();
+        services.AddProviders();
     }
 }

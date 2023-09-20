@@ -7,11 +7,12 @@ public class RegisterUserCommandRequest : IRequest<ResultWrapper>
 {
     public RegisterUserCommandRequest() { }
 
-    public RegisterUserCommandRequest(string userName, string email, string password)
+    public RegisterUserCommandRequest(string userName, string email, string password, Guid roleId)
     {
         UserName = userName;
         Email = email;
         Password = password;
+        RoleId = roleId;
     }
 
     public string UserName { get; set; }

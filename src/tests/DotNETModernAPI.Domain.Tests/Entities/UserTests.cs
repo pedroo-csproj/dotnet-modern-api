@@ -28,7 +28,7 @@ public class UserTests
         Assert.Equal(userName.ToUpper(), user.NormalizedUserName);
         Assert.Equal(email, user.Email);
         Assert.Equal(email.ToUpper(), user.NormalizedEmail);
-        Assert.True(user.EmailConfirmed);
+        Assert.False(user.EmailConfirmed);
         Assert.Null(user.PasswordHash);
         Assert.Null(user.SecurityStamp);
         Assert.NotEqual(Guid.Empty.ToString(), user.ConcurrencyStamp);

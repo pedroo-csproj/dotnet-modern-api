@@ -20,7 +20,7 @@ public class UsersController : ControllerBase
     private readonly IMediator _mediator;
     private readonly JwtServices _jwtServices;
 
-    [HttpPost("Authenticate")]
+    [HttpPost("authenticate")]
     public async Task<IActionResult> Authenticate([FromBody] AuthenticateUserCommandRequest commandRequest)
     {
         var handleResult = await _mediator.Send(commandRequest);
@@ -33,9 +33,20 @@ public class UsersController : ControllerBase
         return Ok(new ResultWrapper<string>(jwt));
     }
 
-    [HttpPost("Register")]
+    [HttpPost("register")]
     [Authorize(Policy = "UsersRegister")]
     public async Task<IActionResult> Register([FromBody] RegisterUserCommandRequest commandRequest)
+    {
+        var handleResult = await _mediator.Send(commandRequest);
+
+        if (!handleResult.Success)
+            return BadRequest(handleResult);
+
+        return Ok(handleResult);
+    }
+
+    [HttpPost("request-password-reset")]
+    public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordResetCommandRequest commandRequest)
     {
         var handleResult = await _mediator.Send(commandRequest);
 

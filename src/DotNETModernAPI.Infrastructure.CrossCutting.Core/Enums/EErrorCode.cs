@@ -7,5 +7,8 @@ public enum EErrorCode
     EmailAlreadyTaken = 2,
     InvalidEntity = 3,
     IdentityError = 4,
-    EmailOrPasswordIncorrect = 5
+    EmailOrPasswordIncorrect = 5,
+    EmailNotFound = 6,
+    EmailNotConfirmed = 7,
+    RoleNotFound = 8
 }

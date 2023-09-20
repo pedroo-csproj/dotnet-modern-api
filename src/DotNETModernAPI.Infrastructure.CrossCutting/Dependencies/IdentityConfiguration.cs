@@ -1,5 +1,6 @@
 ﻿using DotNETModernAPI.Domain.Entities;
 using DotNETModernAPI.Infrastructure.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DotNETModernAPI.Infrastructure.CrossCutting.Dependencies;
@@ -7,7 +8,7 @@ namespace DotNETModernAPI.Infrastructure.CrossCutting.Dependencies;
 internal static class IdentityConfiguration
 {
     public static void AddIdentity(this IServiceCollection services) =>
-        services.AddIdentityCore<User>(io =>
+        services.AddIdentity<User, Role>(io =>
         {
             io.User.RequireUniqueEmail = true;
             io.User.AllowedUserNameCharacters = "qwertyuiopasdfghjklzxcvbnm_";
@@ -18,6 +19,6 @@ internal static class IdentityConfiguration
             io.Password.RequireNonAlphanumeric = false;
             io.Password.RequireUppercase = false;
         })
-        .AddRoles<Role>()
-        .AddEntityFrameworkStores<ApplicationDataContext>();
+        .AddEntityFrameworkStores<ApplicationDataContext>()
+        .AddDefaultTokenProviders();
 }
