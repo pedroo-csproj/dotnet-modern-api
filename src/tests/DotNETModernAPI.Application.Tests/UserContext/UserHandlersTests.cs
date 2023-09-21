@@ -148,4 +148,23 @@ public class UserHandlersTests
 
         _userServices.Verify(us => us.RequestPasswordReset(commandRequest.Email), Times.Once);
     }
+
+    [Fact(DisplayName = "ResetPassword - Valid Command")]
+    public async void ResetPassword_ValidCommand_MustReturnNoError()
+    {
+        // Arrange
+        ResetPasswordCommandRequest commandRequest = new Faker<ResetPasswordCommandRequest>().CustomInstantiator(f => new ResetPasswordCommandRequest(f.Internet.Email(), f.Internet.Password(), Guid.NewGuid().ToString()));
+
+        _userServices.Setup(us => us.ResetPassword(commandRequest.Email, commandRequest.NewPassword, commandRequest.PasswordResetToken)).Returns(Task.FromResult(new ResultWrapper()));
+
+        // Act
+        var handleResult = await _userHandlers.Handle(commandRequest, default);
+
+        // Assert
+        Assert.True(handleResult.Success);
+        Assert.Equal(EErrorCode.NoError, handleResult.ErrorCode);
+        Assert.Empty(handleResult.Errors);
+
+        _userServices.Verify(us => us.ResetPassword(commandRequest.Email, commandRequest.NewPassword, commandRequest.PasswordResetToken), Times.Once);
+    }
 }
