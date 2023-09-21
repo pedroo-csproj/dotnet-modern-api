@@ -87,7 +87,9 @@ stages:
             command: 'buildAndPush'
             Dockerfile: '$(System.DefaultWorkingDirectory)/src/DotNETModernAPI.Presentation/Dockerfile'
             buildContext: '$(System.DefaultWorkingDirectory)/src'
-            tags: '$(Build.BuildId)'
+            tags: |
+              latest
+              $(Build.BuildId)
 
         - task: AzureRmWebAppDeployment@4
           displayName: 'Deploy to App Service'
@@ -98,4 +100,4 @@ stages:
             WebAppName: '$(LinuxWebAppName)'
             DockerNamespace: '$(ContainerRegistryName).azurecr.io'
             DockerRepository: '$(ContainerRepositoryName)'
-            DockerImageTag: '$(Build.BuildId)'
+            DockerImageTag: 'latest'
