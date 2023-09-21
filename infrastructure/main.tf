@@ -40,14 +40,14 @@ resource "azurerm_linux_web_app" "lwa-dnma" {
   service_plan_id     = azurerm_service_plan.sp-dnma.id
   https_only          = var.linux_web_app_https_only
   app_settings = {
-    "DOCKER_REGISTRY_SERVER_URL"      = "https://${var.linux_web_app_name}.azurecr.io"
+    "DOCKER_REGISTRY_SERVER_URL"      = "https://${azurerm_container_registry.cr-dnma.login_server}"
     "DOCKER_REGISTRY_SERVER_PASSWORD" = azurerm_container_registry.cr-dnma.admin_password
     "DOCKER_REGISTRY_SERVER_USERNAME" = azurerm_container_registry.cr-dnma.admin_username
   }
 
   site_config {
     application_stack {
-      docker_registry_url      = "https://${var.linux_web_app_name}.azurecr.io"
+      docker_registry_url      = "https://${azurerm_container_registry.cr-dnma.login_server}"
       docker_image_name        = "${var.linux_web_app_name}:${var.build_id}"
       docker_registry_username = azurerm_container_registry.cr-dnma.admin_username
       docker_registry_password = azurerm_container_registry.cr-dnma.admin_password
