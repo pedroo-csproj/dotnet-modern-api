@@ -23,6 +23,10 @@ resource "azurerm_container_registry" "cr-dnma" {
   location            = azurerm_resource_group.rg-dnma.location
   sku                 = var.container_registry_sku
   admin_enabled       = true
+
+  identity {
+    type = "SystemAssigned"
+  }
 }
 
 resource "azurerm_service_plan" "sp-dnma" {
@@ -41,11 +45,18 @@ resource "azurerm_linux_web_app" "lwa-dnma" {
   https_only          = var.linux_web_app_https_only
 
   site_config {
+    container_registry_use_managed_identity = true
+
     application_stack {
       docker_registry_url      = "https://${azurerm_container_registry.cr-dnma.login_server}"
-      docker_image_name        = "${var.linux_web_app_name}:${var.build_id}"
+      docker_image_name        = "latest"
+      dotnet_version = "7.0"
       docker_registry_username = azurerm_container_registry.cr-dnma.admin_username
       docker_registry_password = azurerm_container_registry.cr-dnma.admin_password
     }
+  }
+
+  identity {
+      type = "SystemAssigned"
   }
 }
