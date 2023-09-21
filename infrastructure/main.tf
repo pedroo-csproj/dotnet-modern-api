@@ -40,6 +40,10 @@ resource "azurerm_linux_web_app" "lwa-dnma" {
   service_plan_id     = azurerm_service_plan.sp-dnma.id
   https_only          = var.linux_web_app_https_only
 
+  identity {
+    type = "SystemAssigned"
+  }
+
   site_config {
     application_stack {
       docker_registry_url      = "https://${azurerm_container_registry.cr-dnma.login_server}"
@@ -48,4 +52,11 @@ resource "azurerm_linux_web_app" "lwa-dnma" {
       docker_registry_password = azurerm_container_registry.cr-dnma.admin_password
     }
   }
+}
+
+resource "azurerm_role_assignment" "ra" {
+  principal_id                     = azurerm_linux_web_app.lwa-dnma.identity[0].object_id
+  role_definition_name             = "AcrPull"
+  scope                            = azurerm_container_registry.cr-dnma.id
+  skip_service_principal_aad_check = true
 }
