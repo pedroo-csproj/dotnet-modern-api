@@ -57,4 +57,4 @@ stages:
             WebAppName: '$(LinuxWebAppName)'
             DockerNamespace: '$(ContainerRegistryName).azurecr.io'
             DockerRepository: '$(ContainerRepositoryName)'
-            DockerImageTag: 'latest'
+            DockerImageTag: '$(Build.BuildId)'
