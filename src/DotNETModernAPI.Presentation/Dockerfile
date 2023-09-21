@@ -18,7 +18,7 @@ WORKDIR "/src/DotNETModernAPI.Presentation"
 RUN dotnet build "DotNETModernAPI.Presentation.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "DotNETModernAPI.Presentation.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "DotNETModernAPI.Presentation.csproj" -c Production -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
