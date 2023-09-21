@@ -14,6 +14,10 @@ variable "container_registry_name" {
   type = string
 }
 
+variable "container_repository_name" {
+  type = string
+}
+
 variable "container_registry_sku" {
   type = string
 }
