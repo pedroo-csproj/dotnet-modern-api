@@ -1,24 +1,30 @@
-version: "3.8"
+version: '3.8'
 
 services:
   api:
     container_name: api
     build:
-      context: ./src
-      dockerfile: ./DotNETModernAPI.Presentation/Dockerfile
+      context: .
+      dockerfile: DotNETModernAPI.Presentation/Dockerfile
+    ports:
+      - 5000:80
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-    ports:
-      - "5001:80"
-      - "44389:443"
+    volumes:
+      - dotnetmodernapi:/api
     depends_on:
-        - db
+      - db
   db:
     image: postgres:15-alpine
     container_name: db
+    ports:
+      - 5432:5432
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=c86d88854a0a0d8ddf2f73d3f1f70043
       - POSTGRES_DB=DotNETModernAPI
-    ports:
-      - 5432:5432
+    volumes:
+      - dotnetmodernapi:/db
+
+volumes:
+  dotnetmodernapi:
