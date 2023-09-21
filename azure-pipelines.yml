@@ -74,6 +74,11 @@ stages:
         steps:
         - task: Docker@2
           inputs:
+            containerRegistry: 'crdnma'
+            command: 'login'
+
+        - task: Docker@2
+          inputs:
             containerRegistry: '$(ContainerRegistryName)'
             repository: '$(ContainerRepositoryName)'
             command: 'buildAndPush'
