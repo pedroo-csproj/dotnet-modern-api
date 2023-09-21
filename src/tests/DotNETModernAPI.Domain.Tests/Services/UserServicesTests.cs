@@ -599,6 +599,74 @@ public class UserServicesTests
 
     #endregion
 
+    #region RequestPasswordReset
+
+    [Fact(DisplayName = "RequestPasswordReset - Invalid Email")]
+    public async void RequestPasswordReset_InvalidEmail_MustReturnEmailNotFound()
+    {
+        // Arrange
+        var email = _faker.Internet.Email();
+
+        _userManager.Setup(um => um.FindByEmailAsync(email)).Returns(Task.FromResult((User)null));
+
+        // Act
+        var result = await _userServices.RequestPasswordReset(email);
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(EErrorCode.EmailNotFound, result.ErrorCode);
+        Assert.Empty(result.Errors);
+
+        _userManager.Verify(um => um.FindByEmailAsync(email), Times.Once);
+        _userManager.Verify(um => um.GeneratePasswordResetTokenAsync(It.IsAny<User>()), Times.Never);
+        _emailProvider.Verify(ep => ep.SendAsync(It.IsAny<EmailRequestModel>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "RequestPasswordReset - Email not Confirmed")]
+    public async void RequestPasswordReset_EmailNotConfirmed_MustReturnEmailNotConfirmed()
+    {
+        // Arrange
+        var user = GenerateUser(false);
+
+        _userManager.Setup(um => um.FindByEmailAsync(user.Email)).Returns(Task.FromResult(user));
+
+        // Act
+        var result = await _userServices.RequestPasswordReset(user.Email);
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(EErrorCode.EmailNotConfirmed, result.ErrorCode);
+        Assert.Empty(result.Errors);
+
+        _userManager.Verify(um => um.FindByEmailAsync(user.Email), Times.Once);
+        _userManager.Verify(um => um.GeneratePasswordResetTokenAsync(It.IsAny<User>()), Times.Never);
+        _emailProvider.Verify(ep => ep.SendAsync(It.IsAny<EmailRequestModel>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "RequestPasswordReset - Valid Data")]
+    public async void RequestPasswordReset_ValidData_MustReturnNoError()
+    {
+        // Arrange
+        var user = GenerateUser();
+
+        _userManager.Setup(um => um.FindByEmailAsync(user.Email)).Returns(Task.FromResult(user));
+        _userManager.Setup(um => um.GeneratePasswordResetTokenAsync(user)).Returns(Task.FromResult(Guid.NewGuid().ToString()));
+
+        // Act
+        var result = await _userServices.RequestPasswordReset(user.Email);
+
+        // Assert
+        Assert.True(result.Success);
+        Assert.Equal(EErrorCode.NoError, result.ErrorCode);
+        Assert.Empty(result.Errors);
+
+        _userManager.Verify(um => um.FindByEmailAsync(user.Email), Times.Once);
+        _userManager.Verify(um => um.GeneratePasswordResetTokenAsync(user), Times.Once);
+        _emailProvider.Verify(ep => ep.SendAsync(It.IsAny<EmailRequestModel>()), Times.Once);
+    }
+
+    #endregion
+
     private static User GenerateUser(bool emailConfirmed = true) =>
         new Faker<User>().CustomInstantiator(f => new User(f.Internet.UserName(), f.Internet.Email()) { EmailConfirmed = emailConfirmed });
 }
