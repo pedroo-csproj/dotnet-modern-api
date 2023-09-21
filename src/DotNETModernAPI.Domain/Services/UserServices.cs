@@ -4,6 +4,7 @@ using DotNETModernAPI.Domain.Providers;
 using DotNETModernAPI.Domain.Repositories;
 using DotNETModernAPI.Domain.Views;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.Enums;
+using DotNETModernAPI.Infrastructure.CrossCutting.Core.Exceptions;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.Models;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
@@ -51,14 +52,17 @@ public class UserServices
 
         IList<Claim> claims = new List<Claim>();
 
-        if (rolesNames.Any())
-        {
-            foreach (var roleName in rolesNames)
-            {
-                var role = await _roleManager.FindByNameAsync(roleName);
+        if (!rolesNames.Any())
+            throw new UserDoesntHaveRolesException();
 
-                claims = await _roleManager.GetClaimsAsync(role);
-            }
+        foreach (var roleName in rolesNames)
+        {
+            var role = await _roleManager.FindByNameAsync(roleName) ?? throw new RoleNotFoundException(roleName);
+
+            claims = await _roleManager.GetClaimsAsync(role);
+
+            if (!claims.Any())
+                throw new RoleWithoutClaimsException(roleName);
         }
 
         return new ResultWrapper<IList<Claim>>(claims);

@@ -35,7 +35,7 @@ public class UserMappersTests
     }
 
     private static RoleVO GenerateRoleVO() =>
-        new RoleVO(Guid.NewGuid(), "Admin");
+        new(Guid.NewGuid(), "Admin");
 
     private static UserRolesView GenerateUserRolesView() =>
         new Faker<UserRolesView>().CustomInstantiator(f => new UserRolesView(Guid.NewGuid(), f.Internet.UserName(), f.Internet.Email(), true, new List<RoleVO>()

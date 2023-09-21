@@ -6,10 +6,12 @@ using DotNETModernAPI.Domain.Repositories;
 using DotNETModernAPI.Domain.Services;
 using DotNETModernAPI.Domain.Views;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.Enums;
+using DotNETModernAPI.Infrastructure.CrossCutting.Core.Exceptions;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
 using Moq;
+using System.Security.Claims;
 using Xunit;
 
 namespace DotNETModernAPI.Domain.Tests.Services;
@@ -58,6 +60,193 @@ public class UserServicesTests
         Assert.Equal(userRoles, result.Data);
 
         _userRepository.Verify(ur => ur.List(), Times.Once);
+    }
+
+    #endregion
+
+    #region Authenticate
+
+    [Fact(DisplayName = "Authenticate - Invalid Email")]
+    public async void Authenticate_InvalidEmail_MustReturnEmailOrPasswordIncorrect()
+    {
+        // Arrange
+        var email = _faker.Internet.Email();
+        var password = _faker.Internet.Password();
+
+        _userManager.Setup(um => um.FindByEmailAsync(email)).Returns(Task.FromResult((User)null));
+
+        // Act
+        var result = await _userServices.Authenticate(email, password);
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(EErrorCode.EmailOrPasswordIncorrect, result.ErrorCode);
+        Assert.Empty(result.Errors);
+
+        _userManager.Verify(um => um.FindByEmailAsync(email), Times.Once);
+        _userManager.Verify(um => um.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
+        _userManager.Verify(um => um.GetRolesAsync(It.IsAny<User>()), Times.Never);
+        _roleManager.Verify(rm => rm.FindByNameAsync(It.IsAny<string>()), Times.Never);
+        _roleManager.Verify(rm => rm.GetClaimsAsync(It.IsAny<Role>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "Authenticate - Email not Confirmed")]
+    public async void Authenticate_EmailNotConfirmed_MustReturnEmailNotConfirmed()
+    {
+        // Arrange
+        var user = GenerateUser(false);
+        var password = _faker.Internet.Password();
+
+        _userManager.Setup(um => um.FindByEmailAsync(user.Email)).Returns(Task.FromResult(user));
+
+        // Act
+        var result = await _userServices.Authenticate(user.Email, password);
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(EErrorCode.EmailNotConfirmed, result.ErrorCode);
+        Assert.Empty(result.Errors);
+
+        _userManager.Verify(um => um.FindByEmailAsync(user.Email), Times.Once);
+        _userManager.Verify(um => um.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
+        _userManager.Verify(um => um.GetRolesAsync(It.IsAny<User>()), Times.Never);
+        _roleManager.Verify(rm => rm.FindByNameAsync(It.IsAny<string>()), Times.Never);
+        _roleManager.Verify(rm => rm.GetClaimsAsync(It.IsAny<Role>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "Authenticate - Incorrect Password")]
+    public async void Authenticate_IncorrectPassword_MustReturnEmailOrPasswordIncorrect()
+    {
+        // Arrange
+        var user = GenerateUser();
+        var password = _faker.Internet.Password();
+
+        _userManager.Setup(um => um.FindByEmailAsync(user.Email)).Returns(Task.FromResult(user));
+        _userManager.Setup(um => um.CheckPasswordAsync(user, password)).Returns(Task.FromResult(false));
+
+        // Act
+        var result = await _userServices.Authenticate(user.Email, password);
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(EErrorCode.EmailOrPasswordIncorrect, result.ErrorCode);
+        Assert.Empty(result.Errors);
+
+        _userManager.Verify(um => um.FindByEmailAsync(user.Email), Times.Once);
+        _userManager.Verify(um => um.CheckPasswordAsync(user, password), Times.Once);
+        _userManager.Verify(um => um.GetRolesAsync(It.IsAny<User>()), Times.Never);
+        _roleManager.Verify(rm => rm.FindByNameAsync(It.IsAny<string>()), Times.Never);
+        _roleManager.Verify(rm => rm.GetClaimsAsync(It.IsAny<Role>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "Authenticate - User doesn't have Roles")]
+    public async void Authenticate_UserDoesntHaveRoles_MustThrowUserDoesntHaveRolesException()
+    {
+        // Arrange
+        var user = GenerateUser();
+        var password = _faker.Internet.Password();
+
+        _userManager.Setup(um => um.FindByEmailAsync(user.Email)).Returns(Task.FromResult(user));
+        _userManager.Setup(um => um.CheckPasswordAsync(user, password)).Returns(Task.FromResult(true));
+        _userManager.Setup(um => um.GetRolesAsync(user)).Returns(Task.FromResult((IList<string>)new List<string>()));
+
+        // Act
+        var exception = await Assert.ThrowsAsync<UserDoesntHaveRolesException>(async () => await _userServices.Authenticate(user.Email, password));
+
+        // Assert
+        Assert.Equal("An User must have at least one Role", exception.Message);
+
+        _userManager.Verify(um => um.FindByEmailAsync(user.Email), Times.Once);
+        _userManager.Verify(um => um.CheckPasswordAsync(user, password), Times.Once);
+        _userManager.Verify(um => um.GetRolesAsync(user), Times.Once);
+        _roleManager.Verify(rm => rm.FindByNameAsync(It.IsAny<string>()), Times.Never);
+        _roleManager.Verify(rm => rm.GetClaimsAsync(It.IsAny<Role>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "Authenticate - Invalid Role")]
+    public async void Authenticate_RoleNotFound_MustThrowRoleNotFoundException()
+    {
+        // Arrange
+        var user = GenerateUser();
+        var password = _faker.Internet.Password();
+        var roles = new List<string>() { "Admin", "Instructor" };
+
+        _userManager.Setup(um => um.FindByEmailAsync(user.Email)).Returns(Task.FromResult(user));
+        _userManager.Setup(um => um.CheckPasswordAsync(user, password)).Returns(Task.FromResult(true));
+        _userManager.Setup(um => um.GetRolesAsync(user)).Returns(Task.FromResult((IList<string>)roles));
+        _roleManager.Setup(rm => rm.FindByNameAsync(roles.First())).Returns(Task.FromResult((Role)null));
+
+        // Act
+        var exception = await Assert.ThrowsAsync<RoleNotFoundException>(async () => await _userServices.Authenticate(user.Email, password));
+
+        // Assert
+        Assert.Equal($"The Role \"{roles.First()}\" doesn't exists", exception.Message);
+
+        _userManager.Verify(um => um.FindByEmailAsync(user.Email), Times.Once);
+        _userManager.Verify(um => um.CheckPasswordAsync(user, password), Times.Once);
+        _userManager.Verify(um => um.GetRolesAsync(user), Times.Once);
+        _roleManager.Verify(rm => rm.FindByNameAsync(roles.First()), Times.Once);
+        _roleManager.Verify(rm => rm.GetClaimsAsync(It.IsAny<Role>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "Authenticate - Role without Claims")]
+    public async void Authenticate_RoleWithoutClaims_MustThrowRoleWithoutClaimsException()
+    {
+        // Arrange
+        var user = GenerateUser();
+        var password = _faker.Internet.Password();
+        var roles = new List<string>() { "Admin", "Instructor" };
+        var role = new Role(roles.First());
+
+        _userManager.Setup(um => um.FindByEmailAsync(user.Email)).Returns(Task.FromResult(user));
+        _userManager.Setup(um => um.CheckPasswordAsync(user, password)).Returns(Task.FromResult(true));
+        _userManager.Setup(um => um.GetRolesAsync(user)).Returns(Task.FromResult((IList<string>)roles));
+        _roleManager.Setup(rm => rm.FindByNameAsync(roles.First())).Returns(Task.FromResult(role));
+        _roleManager.Setup(rm => rm.GetClaimsAsync(role)).Returns(Task.FromResult((IList<Claim>)new List<Claim>()));
+
+        // Act
+        var exception = await Assert.ThrowsAsync<RoleWithoutClaimsException>(async () => await _userServices.Authenticate(user.Email, password));
+
+        // Assert
+        Assert.Equal($"An attempt to retrieve claims of a Role named \"{role.Name}\" happened", exception.Message);
+
+        _userManager.Verify(um => um.FindByEmailAsync(user.Email), Times.Once);
+        _userManager.Verify(um => um.CheckPasswordAsync(user, password), Times.Once);
+        _userManager.Verify(um => um.GetRolesAsync(user), Times.Once);
+        _roleManager.Verify(rm => rm.FindByNameAsync(roles.First()), Times.Once);
+        _roleManager.Verify(rm => rm.GetClaimsAsync(It.IsAny<Role>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "Authenticate - Valid Data")]
+    public async void Authenticate_ValidData_MustReturnNoError()
+    {
+        // Arrange
+        var user = GenerateUser();
+        var password = _faker.Internet.Password();
+        var roles = new List<string>() { "Admin" };
+        var role = new Role(roles.First());
+        var claims = new List<Claim>() { new Claim("aud", "http://localhost:3000") };
+
+        _userManager.Setup(um => um.FindByEmailAsync(user.Email)).Returns(Task.FromResult(user));
+        _userManager.Setup(um => um.CheckPasswordAsync(user, password)).Returns(Task.FromResult(true));
+        _userManager.Setup(um => um.GetRolesAsync(user)).Returns(Task.FromResult((IList<string>)roles));
+        _roleManager.Setup(rm => rm.FindByNameAsync(roles.First())).Returns(Task.FromResult(role));
+        _roleManager.Setup(rm => rm.GetClaimsAsync(role)).Returns(Task.FromResult((IList<Claim>)claims));
+
+        // Act
+        var result = await _userServices.Authenticate(user.Email, password);
+
+        // Assert
+        Assert.True(result.Success);
+        Assert.Equal(EErrorCode.NoError, result.ErrorCode);
+        Assert.Empty(result.Errors);
+        Assert.Equal(claims, result.Data);
+
+        _userManager.Verify(um => um.FindByEmailAsync(user.Email), Times.Once);
+        _userManager.Verify(um => um.CheckPasswordAsync(user, password), Times.Once);
+        _userManager.Verify(um => um.GetRolesAsync(user), Times.Once);
+        _roleManager.Verify(rm => rm.FindByNameAsync(roles.First()), Times.Once);
+        _roleManager.Verify(rm => rm.GetClaimsAsync(It.IsAny<Role>()), Times.Once);
     }
 
     #endregion
@@ -308,6 +497,6 @@ public class UserServicesTests
 
     #endregion
 
-    private static User GenerateUser() =>
-        new Faker<User>().CustomInstantiator(f => new User(f.Internet.UserName(), f.Internet.Email()));
+    private static User GenerateUser(bool emailConfirmed = true) =>
+        new Faker<User>().CustomInstantiator(f => new User(f.Internet.UserName(), f.Internet.Email()) { EmailConfirmed = emailConfirmed });
 }

@@ -14,6 +14,7 @@ using DotNETModernAPI.Infrastructure.CrossCutting.Core.Models;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Moq;
+using System.Security.Claims;
 using Xunit;
 
 namespace DotNETModernAPI.Application.Tests.UserContext;
@@ -68,6 +69,27 @@ public class UserHandlersTests
 
         _userServices.Verify(us => us.List(), Times.Once);
         _mapper.Verify(m => m.Map<IEnumerable<ListUsersQueryResponse>>(listResult.Data), Times.Once);
+    }
+
+    [Fact(DisplayName = "Authenticate - Valid Command")]
+    public async void Authenticate_ValidCommand_MustReturnNoError()
+    {
+        // Arrange
+        AuthenticateUserCommandRequest commandRequest = new Faker<AuthenticateUserCommandRequest>().CustomInstantiator(f => new AuthenticateUserCommandRequest(f.Internet.Email(), f.Internet.Password()));
+        var claims = new List<Claim>() { new Claim("aud", "http://localhost:3000") };
+
+        _userServices.Setup(us => us.Authenticate(commandRequest.Email, commandRequest.Password)).Returns(Task.FromResult(new ResultWrapper<IList<Claim>>(claims)));
+
+        // Act
+        var handleResult = await _userHandlers.Handle(commandRequest, default);
+
+        // Assert
+        Assert.True(handleResult.Success);
+        Assert.Equal(EErrorCode.NoError, handleResult.ErrorCode);
+        Assert.Empty(handleResult.Errors);
+        Assert.Equal(claims, handleResult.Data);
+
+        _userServices.Verify(us => us.Authenticate(commandRequest.Email, commandRequest.Password), Times.Once);
     }
 
     [Fact(DisplayName = "Register - Valid Command")]
