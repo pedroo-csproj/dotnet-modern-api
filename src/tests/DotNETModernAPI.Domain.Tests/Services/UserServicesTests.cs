@@ -82,6 +82,7 @@ public class UserServicesTests
         Assert.False(result.Success);
         Assert.Equal(EErrorCode.EmailOrPasswordIncorrect, result.ErrorCode);
         Assert.Empty(result.Errors);
+        Assert.Null(result.Data);
 
         _userManager.Verify(um => um.FindByEmailAsync(email), Times.Once);
         _userManager.Verify(um => um.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
@@ -106,6 +107,7 @@ public class UserServicesTests
         Assert.False(result.Success);
         Assert.Equal(EErrorCode.EmailNotConfirmed, result.ErrorCode);
         Assert.Empty(result.Errors);
+        Assert.Null(result.Data);
 
         _userManager.Verify(um => um.FindByEmailAsync(user.Email), Times.Once);
         _userManager.Verify(um => um.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
@@ -131,6 +133,7 @@ public class UserServicesTests
         Assert.False(result.Success);
         Assert.Equal(EErrorCode.EmailOrPasswordIncorrect, result.ErrorCode);
         Assert.Empty(result.Errors);
+        Assert.Null(result.Data);
 
         _userManager.Verify(um => um.FindByEmailAsync(user.Email), Times.Once);
         _userManager.Verify(um => um.CheckPasswordAsync(user, password), Times.Once);
@@ -492,6 +495,105 @@ public class UserServicesTests
         _roleManager.Verify(rm => rm.FindByIdAsync(role.Id.ToString()), Times.Once);
         _userManager.Verify(um => um.AddToRoleAsync(It.IsAny<User>(), role.Name), Times.Once);
         _userManager.Verify(um => um.GenerateEmailConfirmationTokenAsync(It.IsAny<User>()), Times.Once);
+        _emailProvider.Verify(ep => ep.SendAsync(It.IsAny<EmailRequestModel>()), Times.Once);
+    }
+
+    #endregion
+
+    #region ConfirmEmail
+
+    [Fact(DisplayName = "ConfirmEmail - Invalid Email")]
+    public async void ConfirmEmail_InvalidEmail_MustReturnEmailNotFound()
+    {
+        // Arrange
+        var email = _faker.Internet.Email();
+        var emailConfirmationToken = Guid.NewGuid().ToString();
+
+        _userManager.Setup(um => um.FindByEmailAsync(email)).Returns(Task.FromResult((User)null));
+
+        // Act
+        var result = await _userServices.ConfirmEmail(email, emailConfirmationToken);
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(EErrorCode.EmailNotFound, result.ErrorCode);
+        Assert.Empty(result.Errors);
+
+        _userManager.Verify(um => um.FindByEmailAsync(email), Times.Once);
+        _userManager.Verify(um => um.ConfirmEmailAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
+        _emailProvider.Verify(ep => ep.SendAsync(It.IsAny<EmailRequestModel>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "ConfirmEmail - Email already Confirmed")]
+    public async void ConfirmEmail_EmailAlreadyConfirmed_MustReturnEmailAlreadyConfirmed()
+    {
+        // Arrange
+        var user = GenerateUser();
+        var emailConfirmationToken = Guid.NewGuid().ToString();
+
+        _userManager.Setup(um => um.FindByEmailAsync(user.Email)).Returns(Task.FromResult(user));
+
+        // Act
+        var result = await _userServices.ConfirmEmail(user.Email, emailConfirmationToken);
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(EErrorCode.EmailAlreadyConfirmed, result.ErrorCode);
+        Assert.Empty(result.Errors);
+
+        _userManager.Verify(um => um.FindByEmailAsync(user.Email), Times.Once);
+        _userManager.Verify(um => um.ConfirmEmailAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
+        _emailProvider.Verify(ep => ep.SendAsync(It.IsAny<EmailRequestModel>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "ConfirmEmail - Invalid Token")]
+    public async void ConfirmEmail_InvalidToken_MustReturnIdentityError()
+    {
+        // Arrange
+        var user = GenerateUser(false);
+        var emailConfirmationToken = Guid.NewGuid().ToString();
+        var error = "Invalid Token";
+        var errors = new List<string>() { error };
+        var confirmEmailResult = IdentityResult.Failed(new IdentityError() { Code = Guid.NewGuid().ToString(), Description = error });
+
+        _userManager.Setup(um => um.FindByEmailAsync(user.Email)).Returns(Task.FromResult(user));
+        _userManager.Setup(um => um.ConfirmEmailAsync(user, emailConfirmationToken)).Returns(Task.FromResult(confirmEmailResult));
+
+        // Act
+        var result = await _userServices.ConfirmEmail(user.Email, emailConfirmationToken);
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(EErrorCode.IdentityError, result.ErrorCode);
+        Assert.Equal(errors, result.Errors);
+
+        _userManager.Verify(um => um.FindByEmailAsync(user.Email), Times.Once);
+        _userManager.Verify(um => um.ConfirmEmailAsync(user, emailConfirmationToken), Times.Once);
+        _emailProvider.Verify(ep => ep.SendAsync(It.IsAny<EmailRequestModel>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "ConfirmEmail - Valid Data")]
+    public async void ConfirmEmail_ValidData_MustReturnNoError()
+    {
+        // Arrange
+        var user = GenerateUser(false);
+        var emailConfirmationToken = Guid.NewGuid().ToString();
+        var confirmEmailResult = IdentityResult.Success;
+        var emailRequest = new EmailRequestModel(user.Email, "Email Confirmed", $"Email confirmed.");
+
+        _userManager.Setup(um => um.FindByEmailAsync(user.Email)).Returns(Task.FromResult(user));
+        _userManager.Setup(um => um.ConfirmEmailAsync(user, emailConfirmationToken)).Returns(Task.FromResult(confirmEmailResult));
+
+        // Act
+        var result = await _userServices.ConfirmEmail(user.Email, emailConfirmationToken);
+
+        // Assert
+        Assert.True(result.Success);
+        Assert.Equal(EErrorCode.NoError, result.ErrorCode);
+        Assert.Empty(result.Errors);
+
+        _userManager.Verify(um => um.FindByEmailAsync(user.Email), Times.Once);
+        _userManager.Verify(um => um.ConfirmEmailAsync(user, emailConfirmationToken), Times.Once);
         _emailProvider.Verify(ep => ep.SendAsync(It.IsAny<EmailRequestModel>()), Times.Once);
     }
 

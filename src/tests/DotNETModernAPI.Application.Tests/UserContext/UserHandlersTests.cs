@@ -110,4 +110,23 @@ public class UserHandlersTests
 
         _userServices.Verify(us => us.Register(commandRequest.UserName, commandRequest.Email, commandRequest.Password, commandRequest.RoleId.ToString()), Times.Once);
     }
+
+    [Fact(DisplayName = "ConfirmEmail - Valid Command")]
+    public async void ConfirmEmail_ValidCommand_MustReturnNoError()
+    {
+        // Arrange
+        ConfirmEmailCommandRequest commandRequest = new Faker<ConfirmEmailCommandRequest>().CustomInstantiator(f => new ConfirmEmailCommandRequest(f.Internet.Email(), Guid.NewGuid().ToString()));
+
+        _userServices.Setup(us => us.ConfirmEmail(commandRequest.Email, commandRequest.EmailConfirmationToken)).Returns(Task.FromResult(new ResultWrapper()));
+
+        // Act
+        var handleResult = await _userHandlers.Handle(commandRequest, default);
+
+        // Assert
+        Assert.True(handleResult.Success);
+        Assert.Equal(EErrorCode.NoError, handleResult.ErrorCode);
+        Assert.Empty(handleResult.Errors);
+
+        _userServices.Verify(us => us.ConfirmEmail(commandRequest.Email, commandRequest.EmailConfirmationToken), Times.Once);
+    }
 }
