@@ -22,13 +22,29 @@ stages:
             projects: '**/*.csproj'
             arguments: '-c Test'
             workingDirectory: '$(System.DefaultWorkingDirectory)/src/tests'
-
-  - stage: 'deploy_services'
-    displayName: 'Deploy Services'
+            
+  - stage: 'build_services'
+    displayName: 'Build Services'
     jobs:
       - job: 'api'
         displayName: 'API'
         steps:
+        - task: replacetokens@5
+          displayName: 'Replace AppSettings Tokens'
+          inputs:
+            rootDirectory: '$(System.DefaultWorkingDirectory)/src/DotNETModernAPI.Presentation'
+            targetFiles: 'appsettings.Production.json'
+            encoding: 'auto'
+            tokenPattern: 'default'
+            writeBOM: true
+            actionOnMissing: 'fail'
+            keepToken: false
+            actionOnNoFiles: 'fail'
+            enableTransforms: false
+            enableRecursion: false
+            useLegacyPattern: false
+            enableTelemetry: true
+
         - task: Docker@2
           displayName: 'Docker Build and Push'
           inputs:
@@ -40,6 +56,13 @@ stages:
             tags: |
               latest
               $(Build.BuildId)
+
+  - stage: 'deploy_services'
+    displayName: 'Deploy Services'
+    jobs:
+      - job: 'api'
+        displayName: 'API'
+        steps:
 
         - task: AzureRmWebAppDeployment@4
           displayName: 'Deploy to AppService'

@@ -15,7 +15,7 @@ internal static class SwaggerConfiguration
     public static void UseSwagger(this IApplicationBuilder app, IConfiguration configuration)
     {
         app.UseSwagger();
-        app.UseSwaggerUI(a => a.SwaggerEndpoint("/swagger/v1/swagger.json", $".NET Modern API - {configuration["Environment"]}"));
+        app.UseSwaggerUI(a => a.SwaggerEndpoint("/swagger/v1/swagger.json", $".NET Modern API - {configuration["Environment"]}:{configuration["BuildId"]}"));
     }
 
     private static OpenApiInfo BuildOpenApiInfo(IConfiguration configuration) =>
