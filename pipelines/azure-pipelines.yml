@@ -40,3 +40,14 @@ stages:
             tags: |
               latest
               $(Build.BuildId)
+
+        - task: AzureRmWebAppDeployment@4
+          displayName: 'Deploy to AppService'
+          inputs:
+            ConnectionType: 'AzureRM'
+            azureSubscription: '$(Subscription)'
+            appType: 'webAppContainer'
+            WebAppName: '$(AppServiceName)'
+            DockerNamespace: '$(ContainerRegistryName).azurecr.io'
+            DockerRepository: '$(ContainerRepositoryName)'
+            DockerImageTag: 'latest'
