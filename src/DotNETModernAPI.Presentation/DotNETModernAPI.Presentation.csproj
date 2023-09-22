@@ -24,6 +24,7 @@
 		<ProjectReference Include="..\DotNETModernAPI.Infrastructure.CrossCutting.Core\DotNETModernAPI.Infrastructure.CrossCutting.Core.csproj" />
 		<ProjectReference Include="..\DotNETModernAPI.Infrastructure.CrossCutting\DotNETModernAPI.Infrastructure.CrossCutting.csproj" />
 		<ProjectReference Include="..\DotNETModernAPI.Infrastructure.Data.Migrations\DotNETModernAPI.Infrastructure.Data.Migrations.csproj" />
+		<ProjectReference Include="..\DotNETModernAPI.Infrastructure.Data\DotNETModernAPI.Infrastructure.Data.csproj" />
 	</ItemGroup>
 
 </Project>

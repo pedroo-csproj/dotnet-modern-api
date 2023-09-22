@@ -1,6 +1,8 @@
 using DotNETModernAPI.Infrastructure.CrossCutting;
+using DotNETModernAPI.Infrastructure.Data;
 using DotNETModernAPI.Presentation.Configurations;
 using DotNETModernAPI.Presentation.Policies;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+
+    var applicationDataContext = scope.ServiceProvider.GetRequiredService<ApplicationDataContext>();
+
+    await applicationDataContext.Database.MigrateAsync();
+}
 
 app.UseSwagger(builder.Configuration);
 app.UseHttpsRedirection();
