@@ -15,13 +15,13 @@ internal static class SwaggerConfiguration
     public static void UseSwagger(this IApplicationBuilder app, IConfiguration configuration)
     {
         app.UseSwagger();
-        app.UseSwaggerUI(a => a.SwaggerEndpoint("/swagger/v1/swagger.json", $".NET Modern API - {configuration["Environment"]}:{configuration["BuildId"]}"));
+        app.UseSwaggerUI(a => a.SwaggerEndpoint("/swagger/v1/swagger.json", $".NET Modern API - {configuration["Environment"]}"));
     }
 
     private static OpenApiInfo BuildOpenApiInfo(IConfiguration configuration) =>
         new()
         {
-            Title = $".NET Modern API - {configuration["Environment"]}",
+            Title = $".NET Modern API - {configuration["Environment"]}:{configuration["BuildId"]}",
             Version = "1.0.0",
             Description = "Template API for modern .NET Core Projects.",
             Contact = new OpenApiContact
