@@ -11,8 +11,8 @@ stages:
   - stage: 'test_services'
     displayName: 'Test Services'
     jobs:
-    - job: 'dotnet_modern_api'
-      displayName: '.NET Modern API'
+    - job: 'api'
+      displayName: 'API'
       continueOnError: false
       steps:
         - task: DotNetCoreCLI@2
@@ -23,19 +23,12 @@ stages:
             arguments: '-c Test'
             workingDirectory: '$(System.DefaultWorkingDirectory)/src/tests'
 
-  - stage: 'build_services'
-    displayName: 'Build Services'
+  - stage: 'deploy_services'
+    displayName: 'Deploy Services'
     jobs:
-      - job: 'dotnet_modern_api'
-        displayName: '.NET Modern API'
+      - job: 'api'
+        displayName: 'API'
         steps:
-        - task: Docker@2
-          displayName: 'Docker Login'
-          inputs:
-            containerRegistry: '$(ContainerRegistryName)'
-            repository: '$(ContainerRepositoryName)'
-            command: 'login'
-
         - task: Docker@2
           displayName: 'Docker Build and Push'
           inputs:
@@ -47,14 +40,3 @@ stages:
             tags: |
               latest
               $(Build.BuildId)
-
-        - task: AzureRmWebAppDeployment@4
-          displayName: 'Deploy to App Service'
-          inputs:
-            ConnectionType: 'AzureRM'
-            azureSubscription: '$(Subscription)'
-            appType: 'webAppContainer'
-            WebAppName: '$(LinuxWebAppName)'
-            DockerNamespace: '$(ContainerRegistryName).azurecr.io'
-            DockerRepository: '$(ContainerRepositoryName)'
-            DockerImageTag: 'latest'
