@@ -11,8 +11,8 @@ stages:
   - stage: 'test_services'
     displayName: 'Test Services'
     jobs:
-    - job: 'api'
-      displayName: 'API'
+    - job: 'dotnet_modern_api'
+      displayName: '.NET Modern API'
       continueOnError: false
       steps:
         - task: DotNetCoreCLI@2
@@ -26,8 +26,8 @@ stages:
   - stage: 'build_services'
     displayName: 'Build Services'
     jobs:
-      - job: 'api'
-        displayName: 'API'
+      - job: 'dotnet_modern_api'
+        displayName: '.NET Modern API'
         steps:
         - task: replacetokens@5
           displayName: 'Replace AppSettings Tokens'
@@ -57,13 +57,48 @@ stages:
               latest
               $(Build.BuildId)
 
+  - stage: 'migrate_databases'
+    displayName: 'Migrate Databases'
+    jobs:
+      - job: 'dotnet_modern_api'
+        displayName: '.NET Modern API'
+        steps:
+          - task: DotNetCoreCLI@2
+            displayName: 'Install Entity Framework Core'
+            inputs:
+              command: custom
+              custom: tool
+              arguments: 'install --global dotnet-ef'
+
+          - task: efcore-migration-script-generator-task@1
+            displayName: 'Generate Migration Script'
+            inputs:
+              projectpath: '$(System.DefaultWorkingDirectory)/src/DotNETModernAPI.Presentation'
+              databasecontexts: 'ApplicationDataContext'
+              targetfolder: '$(System.DefaultWorkingDirectory)/db'
+              configuration: 'Production'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Artifact'
+            inputs:
+              PathtoPublish: '$(System.DefaultWorkingDirectory)/db'
+              ArtifactName: 'db'
+              publishLocation: 'Container'
+
+          - task: Bash@3
+            displayName: 'Execute Migration Script'
+            inputs:
+              targetType: 'inline'
+              script: |
+                apt-get install postgresql-client
+                psql "host=$(SQLDBServer) dbname=$(SQLDBName) user=$(SQLDBUserName) password=$(SQLDBUserPassword)" -f $(System.DefaultWorkingDirectory)/db/ApplicationDataContext.sql
+
   - stage: 'deploy_services'
     displayName: 'Deploy Services'
     jobs:
-      - job: 'api'
-        displayName: 'API'
+      - job: 'dotnet_modern_api'
+        displayName: '.NET Modern API'
         steps:
-
         - task: AzureRmWebAppDeployment@4
           displayName: 'Deploy to AppService'
           inputs:
@@ -73,4 +108,4 @@ stages:
             WebAppName: '$(AppServiceName)'
             DockerNamespace: '$(ContainerRegistryName).azurecr.io'
             DockerRepository: '$(ContainerRepositoryName)'
-            DockerImageTag: 'latest'
+            DockerImageTag: '$(Build.BuildId)'
