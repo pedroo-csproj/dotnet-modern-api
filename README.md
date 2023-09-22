@@ -4,9 +4,11 @@ An template API to provide a fast startup for .NET Core 7 APIs with the best pra
 ### Local
 - In the path "src/DotNETModernAPI.Presentation/appsettings.Development.json", edit the "Email" Section with your email configuration:
     ```
-    "UserName": "pedroo.myself@gmail.com" // Your Email
-    "From": "pedroo.myself@gmail.com", // How the email will be named when an email is send "Password": "qyjachrtyodzgiau", // Email password
-    "Host": "smtp.gmail.com", // Email Host "Port": "587" // Email SMTP Port
+    "UserName" // Your Email
+    "From" // How the email will be named when an email is send 
+    "Password" // Email password
+    "Host" // Email SMTP Host
+    "Port" // Email SMTP Port
     ```
 - In the path "src/" execute in cmd:
     ```
