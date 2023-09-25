@@ -52,7 +52,6 @@ To execute this application in Microsoft Azure you will need the following resou
 # Stay in touch
 - [Github](https://github.com/pedroo-csproj);
 - [LinkedIn](https://www.linkedin.com/in/pedroo-csproj/);
-- [X](https://twitter.com/pedro_csproj).
 
 # License
 .NET Modern API is [MIT licensed](https://github.com/pedroo-csproj/dotnet-modern-api/blob/main/LICENSE).
