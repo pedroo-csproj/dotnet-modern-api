@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDependencies(builder.Configuration);
 builder.Services.AddSwagger(builder.Configuration);
 builder.Services.AddJwtConfiguration(builder.Configuration);
-builder.Services.AddAuthorization(ao => ao.AddUsersOptions());
+builder.Services.AddPolicies();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

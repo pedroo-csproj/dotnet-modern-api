@@ -24,7 +24,7 @@ services:
       - POSTGRES_PASSWORD=c86d88854a0a0d8ddf2f73d3f1f70043
       - POSTGRES_DB=DotNETModernAPI
     volumes:
-      - dotnetmodernapi:/db
+      - dotnetmodernapi:/var/lib/postgresql/data
 
 volumes:
   dotnetmodernapi:
