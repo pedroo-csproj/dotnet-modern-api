@@ -11,7 +11,7 @@ namespace DotNETModernAPI.Domain.Services;
 
 public class RoleServices
 {
-    public RoleServices(RoleManager<Role> roleManager, IValidator<Role> roleValidator, IOptions<PolicyDTO> policies)
+    public RoleServices(RoleManager<Role> roleManager, IValidator<Role> roleValidator, IOptions<PoliciesDTO> policies)
     {
         _roleManager = roleManager;
         _roleValidator = roleValidator;
@@ -20,7 +20,7 @@ public class RoleServices
 
     private readonly RoleManager<Role> _roleManager;
     private readonly IValidator<Role> _roleValidator;
-    private readonly PolicyDTO _policies;
+    private readonly PoliciesDTO _policies;
 
     public virtual async Task<ResultWrapper<Guid>> Create(string name)
     {

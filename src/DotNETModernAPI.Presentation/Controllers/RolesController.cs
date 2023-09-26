@@ -12,19 +12,19 @@ namespace DotNETModernAPI.Presentation.Controllers;
 [ApiController]
 public class RolesController : ControllerBase
 {
-    public RolesController(IMediator mediator, IOptions<PolicyDTO> policies)
+    public RolesController(IMediator mediator, IOptions<PoliciesDTO> policies)
     {
         _mediator = mediator;
         _policies = policies.Value;
     }
 
     private readonly IMediator _mediator;
-    private readonly PolicyDTO _policies;
+    private readonly PoliciesDTO _policies;
 
     [HttpGet("policies")]
     [Authorize(Policy = "RolesListPolicies")]
     public IActionResult ListClaims() =>
-        Ok(new ResultWrapper<PolicyDTO>(_policies));
+        Ok(new ResultWrapper<PoliciesDTO>(_policies));
 
     [HttpPost]
     [Authorize(Policy = "RolesCreate")]

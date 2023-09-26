@@ -19,7 +19,7 @@ public class RoleServicesTests
         var roleStore = new Mock<IRoleStore<Role>>();
         _roleManager = new Mock<RoleManager<Role>>(roleStore.Object, null, null, null, null);
         _roleValidator = new Mock<IValidator<Role>>();
-        _policies = Options.Create<PolicyDTO>(new PolicyDTO()
+        _policies = Options.Create<PoliciesDTO>(new PoliciesDTO()
         {
             Users = new List<string>() { "users.list", "users.register" },
             Roles = new List<string>() { "roles.insertPolicy", "roles.listPolicies", "roles.create", "roles.retrievePolicy" }
@@ -29,7 +29,7 @@ public class RoleServicesTests
 
     private readonly Mock<RoleManager<Role>> _roleManager;
     private readonly Mock<IValidator<Role>> _roleValidator;
-    private readonly IOptions<PolicyDTO> _policies;
+    private readonly IOptions<PoliciesDTO> _policies;
     private readonly RoleServices _roleServices;
 
     #region Create

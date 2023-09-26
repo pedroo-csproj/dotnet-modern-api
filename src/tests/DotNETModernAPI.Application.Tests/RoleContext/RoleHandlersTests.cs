@@ -21,14 +21,14 @@ public class RoleHandlersTests
         var roleStore = new Mock<IRoleStore<Role>>();
         _roleManager = new Mock<RoleManager<Role>>(roleStore.Object, null, null, null, null);
         _roleValidator = new Mock<IValidator<Role>>();
-        _policies = new Mock<IOptions<PolicyDTO>>();
+        _policies = new Mock<IOptions<PoliciesDTO>>();
         _roleServices = new Mock<RoleServices>(_roleManager.Object, _roleValidator.Object, _policies.Object);
         _roleHandlers = new RoleHandlers(_roleServices.Object);
     }
 
     private readonly Mock<RoleManager<Role>> _roleManager;
     private readonly Mock<IValidator<Role>> _roleValidator;
-    private readonly Mock<IOptions<PolicyDTO>> _policies;
+    private readonly Mock<IOptions<PoliciesDTO>> _policies;
     private readonly Mock<RoleServices> _roleServices;
     private readonly RoleHandlers _roleHandlers;
 
