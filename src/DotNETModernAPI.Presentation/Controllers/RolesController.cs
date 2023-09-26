@@ -1,6 +1,6 @@
 ﻿using DotNETModernAPI.Application.RoleContext.Commands.Requests;
+using DotNETModernAPI.Infrastructure.CrossCutting.Core.DTOs;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.Models;
-using DotNETModernAPI.Presentation.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +30,19 @@ public class RolesController : ControllerBase
     [Authorize(Policy = "RolesCreate")]
     public async Task<IActionResult> Create([FromBody] CreateRoleCommandRequest commandRequest)
     {
+        var handleResult = await _mediator.Send(commandRequest);
+
+        if (!handleResult.Success)
+            return BadRequest(handleResult);
+
+        return Ok(handleResult);
+    }
+
+    [HttpPost("{id}/add-claims")]
+    public async Task<IActionResult> Create([FromRoute] Guid id, [FromBody] AddClaimsToRoleCommandRequest commandRequest)
+    {
+        commandRequest.SetId(id);
+
         var handleResult = await _mediator.Send(commandRequest);
 
         if (!handleResult.Success)

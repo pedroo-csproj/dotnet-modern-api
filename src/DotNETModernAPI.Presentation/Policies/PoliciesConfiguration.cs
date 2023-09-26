@@ -1,4 +1,4 @@
-﻿using DotNETModernAPI.Presentation.DTOs;
+﻿using DotNETModernAPI.Infrastructure.CrossCutting.Core.DTOs;
 
 namespace DotNETModernAPI.Presentation.Policies;
 

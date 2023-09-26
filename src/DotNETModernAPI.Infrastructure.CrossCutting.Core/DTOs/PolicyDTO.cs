@@ -1,4 +1,4 @@
-﻿namespace DotNETModernAPI.Presentation.DTOs;
+﻿namespace DotNETModernAPI.Infrastructure.CrossCutting.Core.DTOs;
 
 public class PolicyDTO
 {

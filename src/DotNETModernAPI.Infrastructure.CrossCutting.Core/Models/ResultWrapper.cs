@@ -79,6 +79,12 @@ public class ResultWrapper
         Errors = ConvertErrors(identityErrors);
     }
 
+    public ResultWrapper(EErrorCode errorCode, IList<string> errors)
+    {
+        ErrorCode = errorCode;
+        Errors = errors;
+    }
+
     public bool Success { get => ErrorCode == EErrorCode.NoError; }
     public EErrorCode ErrorCode { get; private set; }
     public IList<string> Errors { get; private set; } = new List<string>();
