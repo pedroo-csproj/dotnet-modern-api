@@ -12,4 +12,5 @@ INSERT INTO public."AspNetRoleClaims"("Id", "RoleId", "ClaimType", "ClaimValue")
 		(1, 'd86839bf-a346-41cd-9d5d-a5bcd4132fb3', 'policy', 'users.list'), 
 		(2, 'd86839bf-a346-41cd-9d5d-a5bcd4132fb3', 'policy', 'users.register'), 
 		(3, 'd86839bf-a346-41cd-9d5d-a5bcd4132fb3', 'policy', 'roles.create'), 
-		(4, 'd86839bf-a346-41cd-9d5d-a5bcd4132fb3', 'policy', 'roles.listPolicies');
+		(4, 'd86839bf-a346-41cd-9d5d-a5bcd4132fb3', 'policy', 'roles.listPolicies'),
+		(5, 'd86839bf-a346-41cd-9d5d-a5bcd4132fb3', 'policy', 'roles.addClaimsToRole');

@@ -39,7 +39,8 @@ public class RolesController : ControllerBase
     }
 
     [HttpPost("{id}/add-claims")]
-    public async Task<IActionResult> Create([FromRoute] Guid id, [FromBody] AddClaimsToRoleCommandRequest commandRequest)
+    [Authorize(Policy = "RolesAddClaimsToRole")]
+    public async Task<IActionResult> AddClaimsToRole([FromRoute] Guid id, [FromBody] AddClaimsToRoleCommandRequest commandRequest)
     {
         commandRequest.SetId(id);
 

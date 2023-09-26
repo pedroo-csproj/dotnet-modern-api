@@ -1,5 +1,4 @@
-﻿using Bogus;
-using DotNETModernAPI.Domain.Entities;
+﻿using DotNETModernAPI.Domain.Entities;
 using DotNETModernAPI.Domain.Validators;
 using Xunit;
 

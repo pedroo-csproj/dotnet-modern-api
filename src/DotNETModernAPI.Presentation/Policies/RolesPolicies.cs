@@ -8,5 +8,6 @@ internal static class RolesPolicies
     {
         options.AddPolicy("RolesListPolicies", apb => apb.RequireAssertion(ahc => ahc.User.HasClaim(c => c.Value == "roles.listPolicies")));
         options.AddPolicy("RolesCreate", apb => apb.RequireAssertion(ahc => ahc.User.HasClaim(c => c.Value == "roles.create")));
+        options.AddPolicy("RolesAddClaimsToRole", apb => apb.RequireAssertion(ahc => ahc.User.HasClaim(c => c.Value == "roles.addClaimsToRole")));
     }
 }
