@@ -8,7 +8,6 @@ public class Role : IdentityRole<Guid>
     {
         Id = Guid.NewGuid();
         Name = name;
-        NormalizedName = Name.ToUpper();
         ConcurrencyStamp = Guid.NewGuid().ToString();
     }
 

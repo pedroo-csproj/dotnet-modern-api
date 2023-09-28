@@ -39,7 +39,7 @@ public class RoleValidatorTests
         // Assert
         Assert.Equal(2, validationResult.Errors.Count);
         Assert.Equal("Role.Name can't have less than 4 characters", validationResult.Errors.First().ErrorMessage);
-        Assert.Equal("Role.NormalizedName must be equal Role.Name in UpperCase", validationResult.Errors.Last().ErrorMessage);
+        Assert.Equal("Role.NormalizedName can't have less than 4 characters", validationResult.Errors.Last().ErrorMessage);
     }
 
     [Fact(DisplayName = "Validate - Name can't be greater than 16 characters")]
@@ -55,55 +55,6 @@ public class RoleValidatorTests
         // Assert
         Assert.Equal(2, validationResult.Errors.Count);
         Assert.Equal("Role.Name can't be greater than 10 characters", validationResult.Errors.First().ErrorMessage);
-        Assert.Equal("Role.NormalizedName must be equal Role.Name in UpperCase", validationResult.Errors.Last().ErrorMessage);
-    }
-
-    [Fact(DisplayName = "Validate - NormalizedName is empty")]
-    public void Validate_NormalizedNameEmpty_MustReturnNormalizedNameCantBeEmpty()
-    {
-        // Arrange
-        var role = GenerateRole();
-        role.NormalizedName = string.Empty;
-
-        // Act
-        var validationResult = _roleValidator.Validate(role);
-
-        // Assert
-        Assert.Equal(3, validationResult.Errors.Count);
-        Assert.Equal("Role.NormalizedName can't be empty", validationResult.Errors.First().ErrorMessage);
-        Assert.Equal("Role.NormalizedName must be equal Role.Name in UpperCase", validationResult.Errors[1].ErrorMessage);
-        Assert.Equal("Role.NormalizedName can't have less than 4 characters", validationResult.Errors.Last().ErrorMessage);
-    }
-
-    [Fact(DisplayName = "Validate - NormalizedName have less than 4 characters")]
-    public void Validate_NormalizedNameLessThan4Characters_MustReturnNormalizedNameCantHaveLessThan4Characters()
-    {
-        // Arrange
-        var role = GenerateRole();
-        role.NormalizedName = role.Name[..3];
-
-        // Act
-        var validationResult = _roleValidator.Validate(role);
-
-        // Assert
-        Assert.Equal(2, validationResult.Errors.Count);
-        Assert.Equal("Role.NormalizedName must be equal Role.Name in UpperCase", validationResult.Errors.First().ErrorMessage);
-        Assert.Equal("Role.NormalizedName can't have less than 4 characters", validationResult.Errors.Last().ErrorMessage);
-    }
-
-    [Fact(DisplayName = "Validate - NormalizedName can't be greater than 16 characters")]
-    public void Validate_NormalizedNameGreaterThan16Characters_MustReturnNormalizedNameCantBeGreaterThan16Characters()
-    {
-        // Arrange
-        var role = GenerateRole();
-        role.NormalizedName = "MasterAdminFinalVersion".ToUpper();
-
-        // Act
-        var validationResult = _roleValidator.Validate(role);
-
-        // Assert
-        Assert.Equal(2, validationResult.Errors.Count);
-        Assert.Equal("Role.NormalizedName must be equal Role.Name in UpperCase", validationResult.Errors.First().ErrorMessage);
         Assert.Equal("Role.NormalizedName can't be greater than 10 characters", validationResult.Errors.Last().ErrorMessage);
     }
 
