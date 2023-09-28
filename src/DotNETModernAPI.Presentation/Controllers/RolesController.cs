@@ -51,6 +51,20 @@ public class RolesController : ControllerBase
         return Ok(handleResult);
     }
 
+    [HttpPut("{id}")]
+    [Authorize(Policy = "RolesUpdate")]
+    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateRoleCommandRequest commandRequest)
+    {
+        commandRequest.SetId(id);
+
+        var handleResult = await _mediator.Send(commandRequest);
+
+        if (!handleResult.Success)
+            return BadRequest(handleResult);
+
+        return Ok(handleResult);
+    }
+
     [HttpPost("{id}/add-claims")]
     [Authorize(Policy = "RolesAddClaimsToRole")]
     public async Task<IActionResult> AddClaimsToRole([FromRoute] Guid id, [FromBody] AddClaimsToRoleCommandRequest commandRequest)

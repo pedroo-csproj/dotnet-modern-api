@@ -52,6 +52,28 @@ public class RoleServices
         return new ResultWrapper<Guid>(role.Id);
     }
 
+    public virtual async Task<ResultWrapper> Update(string id, string name)
+    {
+        var role = await _roleManager.FindByIdAsync(id);
+
+        if (role == null)
+            return new ResultWrapper(EErrorCode.RoleNotFound);
+
+        role.UpdateName(name);
+
+        var validationResult = _roleValidator.Validate(role);
+
+        if (!validationResult.IsValid)
+            return new ResultWrapper(validationResult.Errors);
+
+        var updateRoleResult = await _roleManager.UpdateAsync(role);
+
+        if (!updateRoleResult.Succeeded)
+            return new ResultWrapper(updateRoleResult.Errors);
+
+        return new ResultWrapper();
+    }
+
     public virtual async Task<ResultWrapper> AddClaimsToRole(string id, IEnumerable<Claim> claims)
     {
         var role = await _roleManager.FindByIdAsync(id);

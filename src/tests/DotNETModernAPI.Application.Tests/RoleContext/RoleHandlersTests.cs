@@ -115,6 +115,45 @@ public class RoleHandlersTests
         _roleServices.Verify(rs => rs.Create(commandRequest.Name), Times.Once);
     }
 
+    [Fact(DisplayName = "Update - Invalid Data")]
+    public async void Update_InvalidData_MustReturnError()
+    {
+        // Arrange
+        var commandRequest = GenerateUpdateRoleCommandRequest();
+        var errorCode = EErrorCode.RoleNotFound;
+
+        _roleServices.Setup(rs => rs.Update(commandRequest.Id.ToString(), commandRequest.Name)).Returns(Task.FromResult(new ResultWrapper(errorCode)));
+
+        // Act
+        var handleResult = await _roleHandlers.Handle(commandRequest, default);
+
+        // Assert
+        Assert.False(handleResult.Success);
+        Assert.Equal(errorCode, handleResult.ErrorCode);
+        Assert.Empty(handleResult.Errors);
+
+        _roleServices.Verify(rs => rs.Update(commandRequest.Id.ToString(), commandRequest.Name), Times.Once);
+    }
+
+    [Fact(DisplayName = "Update - Valid Data")]
+    public async void Update_ValidData_MustReturnNoError()
+    {
+        // Arrange
+        var commandRequest = GenerateUpdateRoleCommandRequest();
+
+        _roleServices.Setup(rs => rs.Update(commandRequest.Id.ToString(), commandRequest.Name)).Returns(Task.FromResult(new ResultWrapper()));
+
+        // Act
+        var handleResult = await _roleHandlers.Handle(commandRequest, default);
+
+        // Assert
+        Assert.True(handleResult.Success);
+        Assert.Equal(EErrorCode.NoError, handleResult.ErrorCode);
+        Assert.Empty(handleResult.Errors);
+
+        _roleServices.Verify(rs => rs.Update(commandRequest.Id.ToString(), commandRequest.Name), Times.Once);
+    }
+
     [Fact(DisplayName = "AddClaimsToRole - Invalid Data")]
     public async void AddClaimsToRole_InvalidData_MustReturnInvalidPolicy()
     {
@@ -157,4 +196,7 @@ public class RoleHandlersTests
 
     private static CreateRoleCommandRequest GenerateCreateRoleCommandRequest() =>
         new("Admin");
+
+    private static UpdateRoleCommandRequest GenerateUpdateRoleCommandRequest() =>
+        new(Guid.NewGuid(), "Admin");
 }

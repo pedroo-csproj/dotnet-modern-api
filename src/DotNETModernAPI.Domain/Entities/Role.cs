@@ -11,4 +11,9 @@ public class Role : IdentityRole<Guid>
         NormalizedName = Name.ToUpper();
         ConcurrencyStamp = Guid.NewGuid().ToString();
     }
+
+    public override string NormalizedName { get => Name.ToUpper(); }
+
+    public void UpdateName(string name) =>
+        Name = name;
 }

@@ -13,6 +13,7 @@ namespace DotNETModernAPI.Application.RoleContext;
 public class RoleHandlers :
     IRequestHandler<ListRolesQueryRequest, ResultWrapper<IList<ListRolesQueryResult>>>,
     IRequestHandler<CreateRoleCommandRequest, ResultWrapper<CreateRoleCommandResult>>,
+    IRequestHandler<UpdateRoleCommandRequest, ResultWrapper>,
     IRequestHandler<AddClaimsToRoleCommandRequest, ResultWrapper>
 {
     public RoleHandlers(RoleServices roleServices, IMapper mapper)
@@ -41,6 +42,16 @@ public class RoleHandlers :
             return new ResultWrapper<CreateRoleCommandResult>(createResult.ErrorCode, createResult.Errors);
 
         return new ResultWrapper<CreateRoleCommandResult>(new CreateRoleCommandResult(createResult.Data));
+    }
+
+    public async Task<ResultWrapper> Handle(UpdateRoleCommandRequest commandRequest, CancellationToken cancellationToken)
+    {
+        var updateResult = await _roleServices.Update(commandRequest.Id.ToString(), commandRequest.Name);
+
+        if (!updateResult.Success)
+            return new ResultWrapper(updateResult.ErrorCode, updateResult.Errors);
+
+        return new ResultWrapper();
     }
 
     public async Task<ResultWrapper> Handle(AddClaimsToRoleCommandRequest commandRequest, CancellationToken cancellationToken)

@@ -172,6 +172,114 @@ public class RoleServicesTests
 
     #endregion
 
+    #region Update
+
+    [Fact(DisplayName = "Update - Role doesn't exists")]
+    public async void Update_RoleDoesntExists_MustReturnRoleNotFound()
+    {
+        // Arrange
+        var id = Guid.NewGuid().ToString();
+        var name = "Customer";
+
+        _roleManager.Setup(rm => rm.FindByIdAsync(id)).Returns(Task.FromResult((Role)null));
+
+        // Act
+        var result = await _roleServices.Update(id, name);
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(EErrorCode.RoleNotFound, result.ErrorCode);
+        Assert.Empty(result.Errors);
+
+        _roleManager.Verify(rm => rm.FindByIdAsync(id), Times.Once);
+        _roleValidator.Verify(rv => rv.Validate(It.IsAny<Role>()), Times.Never);
+        _roleManager.Verify(rm => rm.UpdateAsync(It.IsAny<Role>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "Update - Invalid Role for FluentValidator")]
+    public async void Update_InvalidRole_MustReturnInvalidEntity()
+    {
+        // Arrange
+        var role = new Role("Admin");
+        var id = role.Id.ToString();
+        var name = "Customer";
+        var error = "Role.Name Invalid";
+        var errors = new List<string>() { error };
+        var roleValidationResult = new ValidationResult() { Errors = { new ValidationFailure("Name", error) } };
+
+        _roleManager.Setup(rm => rm.FindByIdAsync(id)).Returns(Task.FromResult(role));
+        _roleValidator.Setup(rv => rv.Validate(role)).Returns(roleValidationResult);
+
+        // Act
+        var result = await _roleServices.Update(id, name);
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(EErrorCode.InvalidEntity, result.ErrorCode);
+        Assert.Equal(errors, result.Errors);
+
+        _roleManager.Verify(rm => rm.FindByIdAsync(id), Times.Once);
+        _roleValidator.Verify(rv => rv.Validate(role), Times.Once);
+        _roleManager.Verify(rm => rm.UpdateAsync(It.IsAny<Role>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "Update - Invalid Role for Identity")]
+    public async void Update_InvalidRole_MustReturnIdentityError()
+    {
+        // Arrange
+        var role = new Role("Admin");
+        var id = role.Id.ToString();
+        var name = "Customer";
+        var roleValidationResult = new ValidationResult();
+        var errors = new List<string>() { "Invalid Name" };
+        var updateRoleResult = IdentityResult.Failed(new IdentityError() { Code = Guid.NewGuid().ToString(), Description = errors.First() });
+
+        _roleManager.Setup(rm => rm.FindByIdAsync(id)).Returns(Task.FromResult(role));
+        _roleValidator.Setup(rv => rv.Validate(role)).Returns(roleValidationResult);
+        _roleManager.Setup(rm => rm.UpdateAsync(role)).Returns(Task.FromResult(updateRoleResult));
+
+        // Act
+        var result = await _roleServices.Update(id, name);
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(EErrorCode.IdentityError, result.ErrorCode);
+        Assert.Equal(errors, result.Errors);
+
+        _roleManager.Verify(rm => rm.FindByIdAsync(id), Times.Once);
+        _roleValidator.Verify(rv => rv.Validate(role), Times.Once);
+        _roleManager.Verify(rm => rm.UpdateAsync(role), Times.Once);
+    }
+
+    [Fact(DisplayName = "Update - Invalid Role for Identity")]
+    public async void Update_ValidData_MustReturnNoError()
+    {
+        // Arrange
+        var role = new Role("Admin");
+        var id = role.Id.ToString();
+        var name = "Customer";
+        var roleValidationResult = new ValidationResult();
+        var updateRoleResult = IdentityResult.Success;
+
+        _roleManager.Setup(rm => rm.FindByIdAsync(id)).Returns(Task.FromResult(role));
+        _roleValidator.Setup(rv => rv.Validate(role)).Returns(roleValidationResult);
+        _roleManager.Setup(rm => rm.UpdateAsync(role)).Returns(Task.FromResult(updateRoleResult));
+
+        // Act
+        var result = await _roleServices.Update(id, name);
+
+        // Assert
+        Assert.True(result.Success);
+        Assert.Equal(EErrorCode.NoError, result.ErrorCode);
+        Assert.Empty(result.Errors);
+
+        _roleManager.Verify(rm => rm.FindByIdAsync(id), Times.Once);
+        _roleValidator.Verify(rv => rv.Validate(role), Times.Once);
+        _roleManager.Verify(rm => rm.UpdateAsync(role), Times.Once);
+    }
+
+    #endregion
+
     #region AddClaimsToRole
 
     [Fact(DisplayName = "AddClaimsToRole - Role Doesn't Exists")]
