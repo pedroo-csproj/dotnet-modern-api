@@ -15,6 +15,7 @@ internal static class DataContextConfiguration
             options.UseNpgsql(configuration.GetConnectionString("PostgreSQL"),
                 actions => actions.MigrationsAssembly("DotNETModernAPI.Infrastructure.Data.Migrations")));
 
+        services.AddTransient<IRoleRepository, RoleRepository>();
         services.AddTransient<IUserRepository, UserRepository>();
     }
 }

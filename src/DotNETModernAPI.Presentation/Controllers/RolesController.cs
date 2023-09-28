@@ -1,4 +1,5 @@
 ﻿using DotNETModernAPI.Application.RoleContext.Commands.Requests;
+using DotNETModernAPI.Application.RoleContext.Queries.Requests;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.DTOs;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.Models;
 using MediatR;
@@ -20,6 +21,18 @@ public class RolesController : ControllerBase
 
     private readonly IMediator _mediator;
     private readonly PoliciesDTO _policies;
+
+    [HttpGet]
+    [Authorize(Policy = "RolesListRoles")]
+    public async Task<IActionResult> List([FromRoute] ListRolesQueryRequest queryRequest)
+    {
+        var handleResult = await _mediator.Send(queryRequest);
+
+        if (!handleResult.Success)
+            return BadRequest(handleResult);
+
+        return Ok(handleResult);
+    }
 
     [HttpGet("policies")]
     [Authorize(Policy = "RolesListPolicies")]

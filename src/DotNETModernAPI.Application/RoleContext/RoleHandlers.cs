@@ -1,5 +1,8 @@
-﻿using DotNETModernAPI.Application.RoleContext.Commands.Requests;
+﻿using AutoMapper;
+using DotNETModernAPI.Application.RoleContext.Commands.Requests;
 using DotNETModernAPI.Application.RoleContext.Commands.Results;
+using DotNETModernAPI.Application.RoleContext.Queries.Requests;
+using DotNETModernAPI.Application.RoleContext.Queries.Results;
 using DotNETModernAPI.Domain.Services;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.Models;
 using MediatR;
@@ -8,13 +11,27 @@ using System.Security.Claims;
 namespace DotNETModernAPI.Application.RoleContext;
 
 public class RoleHandlers :
+    IRequestHandler<ListRolesQueryRequest, ResultWrapper<IList<ListRolesQueryResult>>>,
     IRequestHandler<CreateRoleCommandRequest, ResultWrapper<CreateRoleCommandResult>>,
     IRequestHandler<AddClaimsToRoleCommandRequest, ResultWrapper>
 {
-    public RoleHandlers(RoleServices roleServices) =>
+    public RoleHandlers(RoleServices roleServices, IMapper mapper)
+    {
         _roleServices = roleServices;
+        _mapper = mapper;
+    }
 
     private readonly RoleServices _roleServices;
+    private readonly IMapper _mapper;
+
+    public async Task<ResultWrapper<IList<ListRolesQueryResult>>> Handle(ListRolesQueryRequest queryRequest, CancellationToken cancellationToken)
+    {
+        var listResult = await _roleServices.List();
+
+        var mappedQueryResult = _mapper.Map<IList<ListRolesQueryResult>>(listResult.Data);
+
+        return new ResultWrapper<IList<ListRolesQueryResult>>(mappedQueryResult);
+    }
 
     public async Task<ResultWrapper<CreateRoleCommandResult>> Handle(CreateRoleCommandRequest commandRequest, CancellationToken cancellationToken)
     {

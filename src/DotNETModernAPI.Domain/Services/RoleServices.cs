@@ -1,4 +1,5 @@
 ﻿using DotNETModernAPI.Domain.Entities;
+using DotNETModernAPI.Domain.Repositories;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.DTOs;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.Enums;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.Models;
@@ -11,16 +12,25 @@ namespace DotNETModernAPI.Domain.Services;
 
 public class RoleServices
 {
-    public RoleServices(RoleManager<Role> roleManager, IValidator<Role> roleValidator, IOptions<PoliciesDTO> policies)
+    public RoleServices(RoleManager<Role> roleManager, IValidator<Role> roleValidator, IOptions<PoliciesDTO> policies, IRoleRepository roleRepository)
     {
         _roleManager = roleManager;
         _roleValidator = roleValidator;
         _policies = policies.Value;
+        _roleRepository = roleRepository;
     }
 
     private readonly RoleManager<Role> _roleManager;
     private readonly IValidator<Role> _roleValidator;
     private readonly PoliciesDTO _policies;
+    private readonly IRoleRepository _roleRepository;
+
+    public virtual async Task<ResultWrapper<IList<Role>>> List()
+    {
+        var roles = await _roleRepository.List();
+
+        return new ResultWrapper<IList<Role>>(roles);
+    }
 
     public virtual async Task<ResultWrapper<Guid>> Create(string name)
     {

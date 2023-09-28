@@ -1,4 +1,5 @@
 ﻿using DotNETModernAPI.Domain.Entities;
+using DotNETModernAPI.Domain.Repositories;
 using DotNETModernAPI.Domain.Services;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.DTOs;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.Enums;
@@ -24,13 +25,43 @@ public class RoleServicesTests
             Users = new List<string>() { "users.list", "users.register" },
             Roles = new List<string>() { "roles.insertPolicy", "roles.listPolicies", "roles.create", "roles.retrievePolicy" }
         });
-        _roleServices = new RoleServices(_roleManager.Object, _roleValidator.Object, _policies);
+        _roleRepository = new Mock<IRoleRepository>();
+        _roleServices = new RoleServices(_roleManager.Object, _roleValidator.Object, _policies, _roleRepository.Object);
     }
 
     private readonly Mock<RoleManager<Role>> _roleManager;
     private readonly Mock<IValidator<Role>> _roleValidator;
     private readonly IOptions<PoliciesDTO> _policies;
+    private readonly Mock<IRoleRepository> _roleRepository;
     private readonly RoleServices _roleServices;
+
+    #region List
+
+    [Fact(DisplayName = "List - Valid Data")]
+    public async void List_ValidData_MustReturnNoError()
+    {
+        // Arrange
+        var roles = new List<Role>()
+        {
+            new Role("Admin"),
+            new Role("Instructor"),
+        };
+
+        _roleRepository.Setup(rr => rr.List()).Returns(Task.FromResult((IList<Role>)roles));
+
+        // Act
+        var result = await _roleServices.List();
+
+        // Assert
+        Assert.True(result.Success);
+        Assert.Equal(EErrorCode.NoError, result.ErrorCode);
+        Assert.Empty(result.Errors);
+        Assert.Equal(roles, result.Data);
+
+        _roleRepository.Verify(rr => rr.List(), Times.Once);
+    }
+
+    #endregion
 
     #region Create
 
