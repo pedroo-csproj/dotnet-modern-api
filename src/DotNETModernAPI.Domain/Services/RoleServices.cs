@@ -12,15 +12,17 @@ namespace DotNETModernAPI.Domain.Services;
 
 public class RoleServices
 {
-    public RoleServices(RoleManager<Role> roleManager, IValidator<Role> roleValidator, IOptions<PoliciesDTO> policies, IRoleRepository roleRepository)
+    public RoleServices(RoleManager<Role> roleManager, UserManager<User> userManager, IValidator<Role> roleValidator, IOptions<PoliciesDTO> policies, IRoleRepository roleRepository)
     {
         _roleManager = roleManager;
+        _userManager = userManager;
         _roleValidator = roleValidator;
         _policies = policies.Value;
         _roleRepository = roleRepository;
     }
 
     private readonly RoleManager<Role> _roleManager;
+    private readonly UserManager<User> _userManager;
     private readonly IValidator<Role> _roleValidator;
     private readonly PoliciesDTO _policies;
     private readonly IRoleRepository _roleRepository;
@@ -99,6 +101,31 @@ public class RoleServices
             if (!addRoleResult.Succeeded)
                 return new ResultWrapper(addRoleResult.Errors);
         }
+
+        return new ResultWrapper();
+    }
+
+    public virtual async Task<ResultWrapper> RemoveRoleFromUser(string id, string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user == null)
+            return new ResultWrapper(EErrorCode.UserNotFound);
+
+        var role = await _roleManager.FindByIdAsync(id);
+
+        if (role == null)
+            return new ResultWrapper(EErrorCode.RoleNotFound);
+
+        var userIsInRole = await _userManager.IsInRoleAsync(user, role.Name);
+
+        if (!userIsInRole)
+            return new ResultWrapper(EErrorCode.UserDoesntHaveRole);
+
+        var removeFromRoleResult = await _userManager.RemoveFromRoleAsync(user, role.Name);
+
+        if (!removeFromRoleResult.Succeeded)
+            return new ResultWrapper(removeFromRoleResult.Errors);
 
         return new ResultWrapper();
     }

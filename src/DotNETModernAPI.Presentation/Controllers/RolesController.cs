@@ -65,12 +65,24 @@ public class RolesController : ControllerBase
         return Ok(handleResult);
     }
 
-    [HttpPost("{id}/add-claims")]
+    [HttpPost("{id}/claims/add")]
     [Authorize(Policy = "RolesAddClaimsToRole")]
     public async Task<IActionResult> AddClaimsToRole([FromRoute] Guid id, [FromBody] AddClaimsToRoleCommandRequest commandRequest)
     {
         commandRequest.SetId(id);
 
+        var handleResult = await _mediator.Send(commandRequest);
+
+        if (!handleResult.Success)
+            return BadRequest(handleResult);
+
+        return Ok(handleResult);
+    }
+
+    [HttpPost("{Id}/users/{UserId}")]
+    [Authorize(Policy = "RemoveRoleFromUser")]
+    public async Task<IActionResult> RemoveRoleFromUser([FromRoute] RemoveRoleFromUserCommandRequest commandRequest)
+    {
         var handleResult = await _mediator.Send(commandRequest);
 
         if (!handleResult.Success)

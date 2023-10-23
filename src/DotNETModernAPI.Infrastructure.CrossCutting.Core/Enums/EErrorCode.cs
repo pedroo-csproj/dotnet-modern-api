@@ -14,5 +14,7 @@ public enum EErrorCode
     EmailAlreadyConfirmed = 9,
     RoleAlreadyExists = 10,
     InvalidPolicy = 11,
-    PolicyAlreadyAssignedToRole = 12
+    PolicyAlreadyAssignedToRole = 12,
+    UserNotFound = 13,
+    UserDoesntHaveRole = 14
 }

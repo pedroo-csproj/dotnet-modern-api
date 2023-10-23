@@ -14,7 +14,8 @@ public class RoleHandlers :
     IRequestHandler<ListRolesQueryRequest, ResultWrapper<IList<ListRolesQueryResult>>>,
     IRequestHandler<CreateRoleCommandRequest, ResultWrapper<CreateRoleCommandResult>>,
     IRequestHandler<UpdateRoleCommandRequest, ResultWrapper>,
-    IRequestHandler<AddClaimsToRoleCommandRequest, ResultWrapper>
+    IRequestHandler<AddClaimsToRoleCommandRequest, ResultWrapper>,
+    IRequestHandler<RemoveRoleFromUserCommandRequest, ResultWrapper>
 {
     public RoleHandlers(RoleServices roleServices, IMapper mapper)
     {
@@ -65,4 +66,7 @@ public class RoleHandlers :
 
         return new ResultWrapper();
     }
+
+    public async Task<ResultWrapper> Handle(RemoveRoleFromUserCommandRequest commandRequest, CancellationToken cancellationToken) =>
+        await _roleServices.RemoveRoleFromUser(commandRequest.Id.ToString(), commandRequest.UserId.ToString());
 }

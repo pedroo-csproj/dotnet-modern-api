@@ -19,17 +19,20 @@ public class RoleServicesTests
     {
         var roleStore = new Mock<IRoleStore<Role>>();
         _roleManager = new Mock<RoleManager<Role>>(roleStore.Object, null, null, null, null);
+        var userStore = new Mock<IUserStore<User>>();
+        _userManager = new Mock<UserManager<User>>(userStore.Object, null, null, null, null, null, null, null, null);
         _roleValidator = new Mock<IValidator<Role>>();
-        _policies = Options.Create<PoliciesDTO>(new PoliciesDTO()
+        _policies = Options.Create(new PoliciesDTO()
         {
             Users = new List<string>() { "users.list", "users.register" },
             Roles = new List<string>() { "roles.insertPolicy", "roles.listPolicies", "roles.create", "roles.retrievePolicy" }
         });
         _roleRepository = new Mock<IRoleRepository>();
-        _roleServices = new RoleServices(_roleManager.Object, _roleValidator.Object, _policies, _roleRepository.Object);
+        _roleServices = new RoleServices(_roleManager.Object, _userManager.Object, _roleValidator.Object, _policies, _roleRepository.Object);
     }
 
     private readonly Mock<RoleManager<Role>> _roleManager;
+    private readonly Mock<UserManager<User>> _userManager;
     private readonly Mock<IValidator<Role>> _roleValidator;
     private readonly IOptions<PoliciesDTO> _policies;
     private readonly Mock<IRoleRepository> _roleRepository;

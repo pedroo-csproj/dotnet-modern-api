@@ -11,5 +11,6 @@ internal static class RolesPolicies
         options.AddPolicy("RolesCreate", apb => apb.RequireAssertion(ahc => ahc.User.HasClaim(c => c.Value == "roles.create")));
         options.AddPolicy("RolesUpdate", apb => apb.RequireAssertion(ahc => ahc.User.HasClaim(c => c.Value == "roles.update")));
         options.AddPolicy("RolesAddClaimsToRole", apb => apb.RequireAssertion(ahc => ahc.User.HasClaim(c => c.Value == "roles.addClaimsToRole")));
+        options.AddPolicy("RemoveRoleFromUser", apb => apb.RequireAssertion(ahc => ahc.User.HasClaim(c => c.Value == "roles.removeRoleFromUser")));
     }
 }
