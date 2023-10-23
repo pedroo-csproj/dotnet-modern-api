@@ -1,4 +1,5 @@
-﻿using DotNETModernAPI.Domain.Entities;
+﻿using Bogus;
+using DotNETModernAPI.Domain.Entities;
 using DotNETModernAPI.Domain.Repositories;
 using DotNETModernAPI.Domain.Services;
 using DotNETModernAPI.Infrastructure.CrossCutting.Core.DTOs;
@@ -99,7 +100,7 @@ public class RoleServicesTests
         var role = new Role(name);
         var error = "Role.Name can't be empty";
         var errors = new List<string>() { error };
-        var roleValidationResult = new ValidationResult() { Errors = { new ValidationFailure("Name", error) } };
+        var roleValidationResult = new FluentValidation.Results.ValidationResult() { Errors = { new ValidationFailure("Name", error) } };
 
         _roleManager.Setup(rm => rm.FindByNameAsync(name)).Returns(Task.FromResult((Role)null));
         _roleValidator.Setup(rv => rv.Validate(It.IsAny<Role>())).Returns(roleValidationResult);
@@ -124,7 +125,7 @@ public class RoleServicesTests
         // Arrange
         var name = "Admin";
         var role = new Role(name);
-        var roleValidationResult = new ValidationResult();
+        var roleValidationResult = new FluentValidation.Results.ValidationResult();
         var errors = new List<string>() { "Invalid Name" };
         var createRoleResult = IdentityResult.Failed(new IdentityError() { Code = Guid.NewGuid().ToString(), Description = errors.First() });
 
@@ -152,7 +153,7 @@ public class RoleServicesTests
         // Arrange
         var name = "Admin";
         var role = new Role(name);
-        var roleValidationResult = new ValidationResult();
+        var roleValidationResult = new FluentValidation.Results.ValidationResult();
         var createRoleResult = IdentityResult.Success;
 
         _roleManager.Setup(rm => rm.FindByNameAsync(name)).Returns(Task.FromResult((Role)null));
@@ -208,7 +209,7 @@ public class RoleServicesTests
         var name = "Customer";
         var error = "Role.Name Invalid";
         var errors = new List<string>() { error };
-        var roleValidationResult = new ValidationResult() { Errors = { new ValidationFailure("Name", error) } };
+        var roleValidationResult = new FluentValidation.Results.ValidationResult() { Errors = { new ValidationFailure("Name", error) } };
 
         _roleManager.Setup(rm => rm.FindByIdAsync(id)).Returns(Task.FromResult(role));
         _roleValidator.Setup(rv => rv.Validate(role)).Returns(roleValidationResult);
@@ -233,7 +234,7 @@ public class RoleServicesTests
         var role = new Role("Admin");
         var id = role.Id.ToString();
         var name = "Customer";
-        var roleValidationResult = new ValidationResult();
+        var roleValidationResult = new FluentValidation.Results.ValidationResult();
         var errors = new List<string>() { "Invalid Name" };
         var updateRoleResult = IdentityResult.Failed(new IdentityError() { Code = Guid.NewGuid().ToString(), Description = errors.First() });
 
@@ -261,7 +262,7 @@ public class RoleServicesTests
         var role = new Role("Admin");
         var id = role.Id.ToString();
         var name = "Customer";
-        var roleValidationResult = new ValidationResult();
+        var roleValidationResult = new FluentValidation.Results.ValidationResult();
         var updateRoleResult = IdentityResult.Success;
 
         _roleManager.Setup(rm => rm.FindByIdAsync(id)).Returns(Task.FromResult(role));
@@ -418,6 +419,143 @@ public class RoleServicesTests
 
     #endregion
 
-    private IList<Claim> GenerateClaims() =>
+    #region RemoveRoleFromUser
+
+    [Fact(DisplayName = "RemoveRoleFromUser - User Doesn't Exists")]
+    public async void RemoveRoleFromUser_UserDoesntExists_MustReturnUserNotFound()
+    {
+        // Arrange
+        var id = Guid.NewGuid().ToString();
+        var userId = Guid.NewGuid().ToString();
+
+        _userManager.Setup(um => um.FindByIdAsync(userId)).Returns(Task.FromResult((User)null));
+
+        // Act
+        var result = await _roleServices.RemoveRoleFromUser(id, userId);
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(EErrorCode.UserNotFound, result.ErrorCode);
+        Assert.Empty(result.Errors);
+
+        _userManager.Verify(rm => rm.FindByIdAsync(userId), Times.Once);
+        _roleManager.Verify(rm => rm.FindByIdAsync(id), Times.Never);
+        _userManager.Verify(rm => rm.IsInRoleAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
+        _userManager.Verify(rm => rm.RemoveFromRoleAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "RemoveRoleFromUser - Role Doesn't Exists")]
+    public async void RemoveRoleFromUser_RoleDoesntExists_MustReturnRoleNotFound()
+    {
+        // Arrange
+        var id = Guid.NewGuid().ToString();
+        var user = GenerateUser();
+
+        _userManager.Setup(um => um.FindByIdAsync(user.Id.ToString())).Returns(Task.FromResult(user));
+        _roleManager.Setup(rm => rm.FindByIdAsync(id)).Returns(Task.FromResult((Role)null));
+
+        // Act
+        var result = await _roleServices.RemoveRoleFromUser(id, user.Id.ToString());
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(EErrorCode.RoleNotFound, result.ErrorCode);
+        Assert.Empty(result.Errors);
+
+        _userManager.Verify(rm => rm.FindByIdAsync(user.Id.ToString()), Times.Once);
+        _roleManager.Verify(rm => rm.FindByIdAsync(id), Times.Once);
+        _userManager.Verify(rm => rm.IsInRoleAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
+        _userManager.Verify(rm => rm.RemoveFromRoleAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "RemoveRoleFromUser - User isn't in Role")]
+    public async void RemoveRoleFromUser_UserIsntInRole_MustReturnUserDoesntHaveRole()
+    {
+        // Arrange
+        var role = GenerateRole();
+        var user = GenerateUser();
+
+        _userManager.Setup(um => um.FindByIdAsync(user.Id.ToString())).Returns(Task.FromResult(user));
+        _roleManager.Setup(rm => rm.FindByIdAsync(role.Id.ToString())).Returns(Task.FromResult(role));
+        _userManager.Setup(um => um.IsInRoleAsync(user, role.Name)).Returns(Task.FromResult(false));
+
+        // Act
+        var result = await _roleServices.RemoveRoleFromUser(role.Id.ToString(), user.Id.ToString());
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(EErrorCode.UserDoesntHaveRole, result.ErrorCode);
+        Assert.Empty(result.Errors);
+
+        _userManager.Verify(rm => rm.FindByIdAsync(user.Id.ToString()), Times.Once);
+        _roleManager.Verify(rm => rm.FindByIdAsync(role.Id.ToString()), Times.Once);
+        _userManager.Verify(rm => rm.IsInRoleAsync(user, role.Name), Times.Once);
+        _userManager.Verify(rm => rm.RemoveFromRoleAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "RemoveRoleFromUser - Error on remove User from Role")]
+    public async void RemoveRoleFromUser_ErrorRemoveUserFromRole_MustReturnIdentityError()
+    {
+        // Arrange
+        var role = GenerateRole();
+        var user = GenerateUser();
+        var errors = new List<string>() { "Invalid" };
+        var removeUserFromRoleResult = IdentityResult.Failed(new IdentityError() { Code = Guid.NewGuid().ToString(), Description = errors.First() });
+
+        _userManager.Setup(um => um.FindByIdAsync(user.Id.ToString())).Returns(Task.FromResult(user));
+        _roleManager.Setup(rm => rm.FindByIdAsync(role.Id.ToString())).Returns(Task.FromResult(role));
+        _userManager.Setup(um => um.IsInRoleAsync(user, role.Name)).Returns(Task.FromResult(true));
+        _userManager.Setup(um => um.RemoveFromRoleAsync(user, role.Name)).Returns(Task.FromResult(removeUserFromRoleResult));
+
+        // Act
+        var result = await _roleServices.RemoveRoleFromUser(role.Id.ToString(), user.Id.ToString());
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(EErrorCode.IdentityError, result.ErrorCode);
+        Assert.Equal(errors, result.Errors);
+
+        _userManager.Verify(rm => rm.FindByIdAsync(user.Id.ToString()), Times.Once);
+        _roleManager.Verify(rm => rm.FindByIdAsync(role.Id.ToString()), Times.Once);
+        _userManager.Verify(rm => rm.IsInRoleAsync(user, role.Name), Times.Once);
+        _userManager.Verify(rm => rm.RemoveFromRoleAsync(user, role.Name), Times.Once);
+    }
+
+    [Fact(DisplayName = "RemoveRoleFromUser - Valid Data")]
+    public async void RemoveRoleFromUser_ValidData_MustReturnNoError()
+    {
+        // Arrange
+        var role = GenerateRole();
+        var user = GenerateUser();
+        var removeUserFromRoleResult = IdentityResult.Success;
+
+        _userManager.Setup(um => um.FindByIdAsync(user.Id.ToString())).Returns(Task.FromResult(user));
+        _roleManager.Setup(rm => rm.FindByIdAsync(role.Id.ToString())).Returns(Task.FromResult(role));
+        _userManager.Setup(um => um.IsInRoleAsync(user, role.Name)).Returns(Task.FromResult(true));
+        _userManager.Setup(um => um.RemoveFromRoleAsync(user, role.Name)).Returns(Task.FromResult(removeUserFromRoleResult));
+
+        // Act
+        var result = await _roleServices.RemoveRoleFromUser(role.Id.ToString(), user.Id.ToString());
+
+        // Assert
+        Assert.True(result.Success);
+        Assert.Equal(EErrorCode.NoError, result.ErrorCode);
+        Assert.Empty(result.Errors);
+
+        _userManager.Verify(rm => rm.FindByIdAsync(user.Id.ToString()), Times.Once);
+        _roleManager.Verify(rm => rm.FindByIdAsync(role.Id.ToString()), Times.Once);
+        _userManager.Verify(rm => rm.IsInRoleAsync(user, role.Name), Times.Once);
+        _userManager.Verify(rm => rm.RemoveFromRoleAsync(user, role.Name), Times.Once);
+    }
+
+    #endregion
+
+    private static IList<Claim> GenerateClaims() =>
         new List<Claim>() { new Claim("policy", "roles.listPolicies"), new Claim("policy", "roles.create") };
+
+    private static User GenerateUser() =>
+        new Faker<User>().CustomInstantiator(f => new User(f.Internet.UserName(), f.Internet.Email()));
+
+    private static Role GenerateRole() =>
+        new("admin");
 }

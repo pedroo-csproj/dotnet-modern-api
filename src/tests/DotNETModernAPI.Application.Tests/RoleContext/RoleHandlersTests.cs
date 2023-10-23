@@ -24,15 +24,18 @@ public class RoleHandlersTests
     {
         var roleStore = new Mock<IRoleStore<Role>>();
         _roleManager = new Mock<RoleManager<Role>>(roleStore.Object, null, null, null, null);
+        var userStore = new Mock<IUserStore<User>>();
+        _userManager = new Mock<UserManager<User>>(userStore.Object, null, null, null, null, null, null, null, null);
         _roleValidator = new Mock<IValidator<Role>>();
         _policies = new Mock<IOptions<PoliciesDTO>>();
         _roleRepository = new Mock<IRoleRepository>();
-        _roleServices = new Mock<RoleServices>(_roleManager.Object, _roleValidator.Object, _policies.Object, _roleRepository.Object);
+        _roleServices = new Mock<RoleServices>(_roleManager.Object, _userManager.Object, _roleValidator.Object, _policies.Object, _roleRepository.Object);
         _mapper = new Mock<IMapper>();
         _roleHandlers = new RoleHandlers(_roleServices.Object, _mapper.Object);
     }
 
     private readonly Mock<RoleManager<Role>> _roleManager;
+    private readonly Mock<UserManager<User>> _userManager;
     private readonly Mock<IValidator<Role>> _roleValidator;
     private readonly Mock<IOptions<PoliciesDTO>> _policies;
     private readonly Mock<IRoleRepository> _roleRepository;
@@ -63,7 +66,7 @@ public class RoleHandlersTests
         Assert.True(handleResult.Success);
         Assert.Equal(EErrorCode.NoError, handleResult.ErrorCode);
         Assert.Empty(handleResult.Errors);
-        Assert.Equal(2, handleResult.Data.Count());
+        Assert.Equal(2, handleResult.Data.Count);
         Assert.Equal(roles.First().Id, handleResult.Data.First().Id);
         Assert.Equal(roles.First().Name, handleResult.Data.First().Name);
         Assert.Equal(roles.Last().Id, handleResult.Data.Last().Id);
@@ -192,6 +195,25 @@ public class RoleHandlersTests
         Assert.Empty(handleResult.Errors);
 
         _roleServices.Verify(rs => rs.AddClaimsToRole(commandRequest.Id.ToString(), It.IsAny<IEnumerable<Claim>>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "RemoveRoleFromUser - Valid Data")]
+    public async void RemoveRoleFromUser_ValidData_MustReturnNoError()
+    {
+        // Arrange
+        var commandRequest = new RemoveRoleFromUserCommandRequest(Guid.NewGuid(), Guid.NewGuid());
+
+        _roleServices.Setup(rs => rs.RemoveRoleFromUser(commandRequest.Id.ToString(), commandRequest.UserId.ToString())).Returns(Task.FromResult(new ResultWrapper()));
+
+        // Act
+        var handleResult = await _roleHandlers.Handle(commandRequest, default);
+
+        // Assert
+        Assert.True(handleResult.Success);
+        Assert.Equal(EErrorCode.NoError, handleResult.ErrorCode);
+        Assert.Empty(handleResult.Errors);
+
+        _roleServices.Verify(rs => rs.RemoveRoleFromUser(commandRequest.Id.ToString(), commandRequest.UserId.ToString()), Times.Once);
     }
 
     private static CreateRoleCommandRequest GenerateCreateRoleCommandRequest() =>
