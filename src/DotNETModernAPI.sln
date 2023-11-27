@@ -45,6 +45,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNETModernAPI.Infrastruct
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{04AAC54A-1215-441C-BED1-485C4A288DF5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0 - Presentation", "0 - Presentation", "{CE3EA1EB-DE11-45D8-B5DE-702B2E46E5B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNETModernAPI.Presentation.Tests", "tests\DotNETModernAPI.Presentation.Tests\DotNETModernAPI.Presentation.Tests.csproj", "{346C3202-B02D-4C61-91D5-C445223B5C77}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +99,10 @@ Global
 		{04AAC54A-1215-441C-BED1-485C4A288DF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04AAC54A-1215-441C-BED1-485C4A288DF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04AAC54A-1215-441C-BED1-485C4A288DF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{346C3202-B02D-4C61-91D5-C445223B5C77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{346C3202-B02D-4C61-91D5-C445223B5C77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{346C3202-B02D-4C61-91D5-C445223B5C77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{346C3202-B02D-4C61-91D5-C445223B5C77}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -115,6 +123,8 @@ Global
 		{A01A1E2A-624A-439E-978C-256888FD1036} = {DCF069D7-B06B-4AFC-BC5D-70C5856F8881}
 		{83C0955C-57E3-407B-8E47-D9D40FDC3C45} = {2C4F3535-E4F2-4EA7-BDF4-77389E775951}
 		{DAEFE829-CDD4-4B00-BC4B-BF7E460383E5} = {83C0955C-57E3-407B-8E47-D9D40FDC3C45}
+		{CE3EA1EB-DE11-45D8-B5DE-702B2E46E5B1} = {F0F8ABD0-BF3C-47B7-A055-4BB974761C91}
+		{346C3202-B02D-4C61-91D5-C445223B5C77} = {CE3EA1EB-DE11-45D8-B5DE-702B2E46E5B1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {10C69A70-37C5-448A-94BD-22B55D059253}
